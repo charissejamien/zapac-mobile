@@ -8,10 +8,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'header-blue': '#4B6FA8',
-        'accent-green': '#5A9E82',
-        'input-bg': '#EDE6D3',
-        'error-red': '#E53935',
+        'header-blue': '#4A6FA5',
+        'accent-green': '#6CA89A',
+        'input-bg': '#F3EEE6',
+        'error-red': '#EA4335',
       },
     },
   },
