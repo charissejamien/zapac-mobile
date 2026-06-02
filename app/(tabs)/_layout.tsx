@@ -53,8 +53,6 @@ export default function TabLayout() {
       />
       <Tabs.Screen name="explore" options={{ href: null }} />
       <Tabs.Screen name="example" options={{ href: null }} />
-      <Tabs.Screen name="notifications" options={{ href: null }} />
-      <Tabs.Screen name="help-feedback" options={{ href: null }} />
     </Tabs>
   );
 }

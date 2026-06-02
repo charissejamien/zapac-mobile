@@ -47,7 +47,7 @@ export default function SettingsScreen() {
             darkMode={darkMode}
             icon={<Ionicons name="notifications" size={17} color={SETTINGS_COLORS.icon} />}
             label="Notifications"
-            onPress={() => router.push('/(tabs)/notifications')}
+            onPress={() => router.push('/settings/notifications')}
           />
         </SettingsSection>
 
@@ -56,13 +56,13 @@ export default function SettingsScreen() {
             darkMode={darkMode}
             icon={<Feather name="help-circle" size={18} color={SETTINGS_COLORS.icon} />}
             label="Help & Feedback"
-            onPress={() => router.push('/(tabs)/help-feedback')}
+            onPress={() => router.push('/settings/help-feedback')}
           />
           <SettingsRow
             darkMode={darkMode}
             icon={<Feather name="info" size={18} color={SETTINGS_COLORS.icon} />}
             label="About"
-            onPress={() => showComingSoon('About')}
+            onPress={() => router.push('/settings/about')}
           />
         </SettingsSection>
 
