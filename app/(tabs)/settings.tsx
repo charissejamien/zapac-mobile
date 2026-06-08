@@ -1,13 +1,13 @@
-import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useState } from "react";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 
-import { SettingsHeader } from '@/components/settings/settings-header';
-import { SettingsRow } from '@/components/settings/settings-row';
-import { SettingsSection } from '@/components/settings/settings-section';
-import { SETTINGS_COLORS } from '@/components/settings/settings-theme';
+import { SettingsHeader } from "@/components/settings/settings-header";
+import { SettingsRow } from "@/components/settings/settings-row";
+import { SettingsSection } from "@/components/settings/settings-section";
+import { SETTINGS_COLORS } from "@/components/settings/settings-theme";
 
 export default function SettingsScreen() {
   const [darkMode, setDarkMode] = useState(false);
@@ -17,10 +17,18 @@ export default function SettingsScreen() {
   };
 
   const confirmLogout = () => {
-    Alert.alert('Log out?', 'You will need to sign in again to access your account.', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Log out', style: 'destructive', onPress: () => router.replace('/(auth)/login') },
-    ]);
+    Alert.alert(
+      "Log out?",
+      "You will need to sign in again to access your account.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Log out",
+          style: "destructive",
+          onPress: () => router.replace("/(auth)/login"),
+        },
+      ],
+    );
   };
 
   return (
@@ -30,10 +38,13 @@ export default function SettingsScreen() {
       <SettingsHeader
         email="cess@gmail.com"
         name="GWAPA"
-        onEditProfile={() => showComingSoon('Edit profile')}
+        onEditProfile={() => showComingSoon("Edit profile")}
       />
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
         <SettingsSection darkMode={darkMode} title="PREFERENCES">
           <SettingsRow
             darkMode={darkMode}
@@ -45,24 +56,38 @@ export default function SettingsScreen() {
           />
           <SettingsRow
             darkMode={darkMode}
-            icon={<Ionicons name="notifications" size={17} color={SETTINGS_COLORS.icon} />}
+            icon={
+              <Ionicons
+                name="notifications"
+                size={17}
+                color={SETTINGS_COLORS.icon}
+              />
+            }
             label="Notifications"
-            onPress={() => router.push('/settings/notifications')}
+            onPress={() => router.push("/settings/notifications")}
           />
         </SettingsSection>
 
         <SettingsSection darkMode={darkMode} title="SUPPORT">
           <SettingsRow
             darkMode={darkMode}
-            icon={<Feather name="help-circle" size={18} color={SETTINGS_COLORS.icon} />}
+            icon={
+              <Feather
+                name="help-circle"
+                size={18}
+                color={SETTINGS_COLORS.icon}
+              />
+            }
             label="Help & Feedback"
-            onPress={() => router.push('/settings/help-feedback')}
+            onPress={() => router.push("/settings/help-feedback")}
           />
           <SettingsRow
             darkMode={darkMode}
-            icon={<Feather name="info" size={18} color={SETTINGS_COLORS.icon} />}
+            icon={
+              <Feather name="info" size={18} color={SETTINGS_COLORS.icon} />
+            }
             label="About"
-            onPress={() => router.push('/settings/about')}
+            onPress={() => router.push("/settings/about")}
           />
         </SettingsSection>
 
@@ -70,7 +95,13 @@ export default function SettingsScreen() {
           <SettingsRow
             darkMode={darkMode}
             destructive
-            icon={<MaterialCommunityIcons name="logout" size={18} color={SETTINGS_COLORS.red} />}
+            icon={
+              <MaterialCommunityIcons
+                name="logout"
+                size={18}
+                color={SETTINGS_COLORS.red}
+              />
+            }
             label="Logout"
             onPress={confirmLogout}
           />
