@@ -1,22 +1,32 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {
+  EmptyFavoritesState,
+  FAVORITES_HEADER_COLOR,
+  FavoritesHeader,
+} from "@/components/favorites";
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, View } from "react-native";
 
-export default function FavoritesScreen() {
+export default function FavoriteScreen() {
+  const router = useRouter();
+
   return (
-    <View style={styles.screen}>
-      <Text style={styles.text}>Favorites - coming soon</Text>
+    <View style={styles.container}>
+      <StatusBar style="light" backgroundColor={FAVORITES_HEADER_COLOR} />
+
+      <FavoritesHeader
+        title="Favorite Routes"
+        onBackPress={() => router.back()}
+        onAddPress={() => router.push("/addFavorites")}
+      />
+      <EmptyFavoritesState />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
+  container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  text: {
-    color: '#527AAF',
-    fontSize: 16,
-    fontWeight: '600',
+    backgroundColor: "#fff",
   },
 });
