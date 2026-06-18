@@ -1,21 +1,24 @@
 export interface Insight {
   id: string;
-
-  userName: string;
-  avatar: string;
+  user_id: string;
 
   category:
-    | "All"
     | "Warning"
     | "Shortcuts"
     | "Fare Tips"
     | "Driver Reviews";
 
   route: string;
-  timeAgo: string;
-
   content: string;
+
+  created_at: string;
+
+  profiles: {
+    username: string;
+    avatar_url: string | null;
+  };
 
   likes: number;
   dislikes: number;
+  userReaction: "like" | "dislike" | null;
 }

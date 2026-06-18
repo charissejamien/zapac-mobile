@@ -1,53 +1,186 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Dimensions,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
+
+import { Ionicons } from "@expo/vector-icons";
+
+const SCREEN_HEIGHT =
+  Dimensions.get("window").height;
 
 interface Props {
   visible: boolean;
+  isOwner: boolean;
+  onClose: () => void;
+  onDelete?: () => void;
 }
 
 export default function InsightMenu({
   visible,
+  isOwner,
+  onClose,
+  onDelete,
 }: Props) {
-  if (!visible) return null;
+  const slideAnim = useRef(
+    new Animated.Value(SCREEN_HEIGHT)
+  ).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      slideAnim.setValue(SCREEN_HEIGHT);
+    }
+  }, [visible]);
+
+  const handleClose = () => {
+    Animated.timing(slideAnim, {
+      toValue: SCREEN_HEIGHT,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => onClose());
+  };
 
   return (
-    <View style={styles.menu}>
-      <TouchableOpacity style={styles.item}>
-        <Text>Share</Text>
-      </TouchableOpacity>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="none"
+      onRequestClose={handleClose}
+    >
+      <TouchableWithoutFeedback
+        onPress={handleClose}
+      >
+        <View style={styles.overlay}>
+          <TouchableWithoutFeedback>
+            <Animated.View
+              style={[
+                styles.sheet,
+                {
+                  transform: [
+                    { translateY: slideAnim },
+                  ],
+                },
+              ]}
+            >
+              <Text style={styles.title}>
+                More Options
+              </Text>
 
-      <TouchableOpacity style={styles.item}>
-        <Text>Report</Text>
-      </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.item}
+                onPress={handleClose}
+              >
+                <Ionicons
+                  name="arrow-redo-outline"
+                  size={20}
+                  color="#333"
+                />
+                <Text style={styles.itemText}>
+                  Share
+                </Text>
+              </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item}>
-        <Text>Save</Text>
-      </TouchableOpacity>
-    </View>
+              <TouchableOpacity
+                style={styles.item}
+                onPress={handleClose}
+              >
+                <Ionicons
+                  name="flag-outline"
+                  size={20}
+                  color="#333"
+                />
+                <Text style={styles.itemText}>
+                  Report
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.item}
+                onPress={handleClose}
+              >
+                <Ionicons
+                  name="download-outline"
+                  size={20}
+                  color="#333"
+                />
+                <Text style={styles.itemText}>
+                  Save
+                </Text>
+              </TouchableOpacity>
+
+              {isOwner && (
+                <TouchableOpacity
+                  style={styles.item}
+                  onPress={onDelete}
+                >
+                  <Ionicons
+                    name="trash-outline"
+                    size={20}
+                    color="#E53935"
+                  />
+                  <Text
+                    style={styles.deleteText}
+                  >
+                    Delete
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </Animated.View>
+          </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  menu: {
-    position: "absolute",
-    top: 25,
-    right: 0,
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
 
-    width: 140,
-
+  sheet: {
     backgroundColor: "#FFF",
-    borderRadius: 10,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 16,
+    paddingBottom: 36,
+    paddingHorizontal: 20,
+  },
 
-    elevation: 5,
-    zIndex: 1000,
+  title: {
+    fontSize: 13,
+    color: "#999",
+    marginBottom: 12,
   },
 
   item: {
-    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 14,
+    gap: 14,
+  },
+
+  itemText: {
+    fontSize: 16,
+    color: "#333",
+  },
+
+  deleteText: {
+    fontSize: 16,
+    color: "#E53935",
+    fontWeight: "600",
   },
 });
