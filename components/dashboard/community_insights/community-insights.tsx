@@ -1,252 +1,248 @@
-import React, { useRef, useState } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import {
-  Animated,
+  ActivityIndicator,
   FlatList,
-  PanResponder,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
+
+import { supabase } from "@/src/lib/supabase";
 
 import FilterCarousel from "./filter-carousel";
 import InsightCard from "./insight-card";
 import InsightFAB from "./insight-fab";
+import NewInsightModal from "./new-insight-modal";
+import { Insight } from "./types";
 
-interface Props {
-  onClose: () => void;
+export interface CommunityInsightsRef {
+  refresh: () => void;
 }
 
-const MOCK_DATA = [
-  {
-    id: "1",
-    userName: "Zoie Laverne",
-    avatar: "https://i.pravatar.cc/150?img=1",
-    category: "Warning" as const,
-    route: "Escario",
-    timeAgo: "2 days ago",
-    content:
-      "Traffic near Escario. Better to walk than wait.",
-    likes: 20,
-    dislikes: 3,
-  },
-  {
-    id: "2",
-    userName: "Megara",
-    avatar: "https://i.pravatar.cc/150?img=5",
-    category: "Shortcuts" as const,
-    route: "Fuente",
-    timeAgo: "1 week ago",
-    content:
-      "Shortcut available through side streets.",
-    likes: 10,
-    dislikes: 0,
-  },
-];
-
-export default function CommunityInsights({
-  onClose,
-}: Props) {
+const CommunityInsights = forwardRef<
+  CommunityInsightsRef
+>((_props, ref) => {
+  const [insights, setInsights] = useState<
+    Insight[]
+  >([]);
+  const [loading, setLoading] = useState(true);
   const [selected, setSelected] =
     useState("All");
+  const [showNewInsight, setShowNewInsight] =
+    useState(false);
+  const [userId, setUserId] = useState<
+    string | null
+  >(null);
 
-  const [openMenuId, setOpenMenuId] =
-    useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth
+      .getUser()
+      .then(({ data: { user } }) => {
+        if (user) setUserId(user.id);
+      });
+  }, []);
 
-  const translateY = useRef(
-    new Animated.Value(0)
-  ).current;
+  const fetchInsights =
+    useCallback(async () => {
+      const { data: rows } = await supabase
+        .from("community_insights")
+        .select(
+          "*, profiles(username, avatar_url)"
+        )
+        .order("created_at", {
+          ascending: false,
+        });
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (
-        _,
-        gesture
-      ) => Math.abs(gesture.dy) > 10,
+      if (!rows) {
+        setLoading(false);
+        return;
+      }
 
-      onPanResponderMove: (
-        _,
-        gesture
-      ) => {
-        if (gesture.dy > 0) {
-          translateY.setValue(
-            gesture.dy
-          );
-        }
-      },
+      const ids = rows.map(
+        (r: any) => r.id
+      );
 
-      onPanResponderRelease: (
-        _,
-        gesture
-      ) => {
-        if (gesture.dy > 120) {
-          Animated.timing(
-            translateY,
-            {
-              toValue: 600,
-              duration: 250,
-              useNativeDriver: true,
-            }
-          ).start(onClose);
+      const { data: allReactions } =
+        await supabase
+          .from("insight_reactions")
+          .select("insight_id, reaction, user_id")
+          .in("insight_id", ids);
+
+      const likeCounts: Record<string, number> =
+        {};
+      const dislikeCounts: Record<
+        string,
+        number
+      > = {};
+      const userReactions: Record<
+        string,
+        string
+      > = {};
+
+      for (const r of allReactions ?? []) {
+        if (r.reaction === "like") {
+          likeCounts[r.insight_id] =
+            (likeCounts[r.insight_id] ?? 0) +
+            1;
         } else {
-          Animated.spring(
-            translateY,
-            {
-              toValue: 0,
-              useNativeDriver: true,
-            }
-          ).start();
+          dislikeCounts[r.insight_id] =
+            (dislikeCounts[r.insight_id] ??
+              0) + 1;
         }
-      },
-    })
-  ).current;
+        if (r.user_id === userId) {
+          userReactions[r.insight_id] =
+            r.reaction;
+        }
+      }
+
+      const merged: Insight[] = rows.map(
+        (row: any) => ({
+          ...row,
+          likes: likeCounts[row.id] ?? 0,
+          dislikes:
+            dislikeCounts[row.id] ?? 0,
+          userReaction:
+            (userReactions[row.id] as
+              | "like"
+              | "dislike") ?? null,
+        })
+      );
+
+      setInsights(merged);
+      setLoading(false);
+    }, [userId]);
+
+  useEffect(() => {
+    if (userId) fetchInsights();
+  }, [userId, fetchInsights]);
+
+  useImperativeHandle(ref, () => ({
+    refresh: fetchInsights,
+  }));
+
+  const handleReact = async (
+    insightId: string,
+    type: "like" | "dislike"
+  ) => {
+    if (!userId) return;
+
+    const insight = insights.find(
+      (i) => i.id === insightId
+    );
+    if (!insight) return;
+
+    if (insight.userReaction === type) {
+      await supabase
+        .from("insight_reactions")
+        .delete()
+        .eq("insight_id", insightId)
+        .eq("user_id", userId);
+    } else {
+      await supabase
+        .from("insight_reactions")
+        .upsert(
+          {
+            insight_id: insightId,
+            user_id: userId,
+            reaction: type,
+          },
+          {
+            onConflict:
+              "insight_id,user_id",
+          }
+        );
+    }
+
+    await fetchInsights();
+  };
+
+  const handleDelete = async (
+    insightId: string
+  ) => {
+    await supabase
+      .from("community_insights")
+      .delete()
+      .eq("id", insightId);
+
+    await fetchInsights();
+  };
 
   const filteredInsights =
     selected === "All"
-      ? MOCK_DATA
-      : MOCK_DATA.filter(
+      ? insights
+      : insights.filter(
           (item) =>
             item.category === selected
         );
 
   return (
-    <View style={styles.overlay}>
-      <Animated.View
-        {...panResponder.panHandlers}
-        style={[
-          styles.sheet,
-          {
-            transform: [
-              {
-                translateY,
-              },
-            ],
-          },
-        ]}
-      >
-        <View style={styles.topAccent} />
+    <View style={styles.content}>
+      <FilterCarousel
+        selected={selected}
+        onSelect={setSelected}
+      />
 
-        <View style={styles.handle} />
-
-        <View style={styles.composer}>
-          <Text style={styles.composerPrefix}>
-            Taga
-          </Text>
-
-          <Text style={styles.brand}>
-            ZAPAC
-          </Text>
-
-          <Text style={styles.composerSuffix}>
-            says...
-          </Text>
-        </View>
-
-        <FilterCarousel
-          selected={selected}
-          onSelect={setSelected}
+      {loading ? (
+        <ActivityIndicator
+          style={styles.loader}
+          size="large"
+          color="#74AFA0"
         />
-
+      ) : (
         <FlatList
           data={filteredInsights}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{
             paddingBottom: 24,
+            paddingTop: 4,
           }}
           renderItem={({ item }) => (
             <InsightCard
               insight={item}
-              menuVisible={
-                openMenuId === item.id
+              isOwner={
+                item.user_id === userId
               }
-              onMenuToggle={() =>
-                setOpenMenuId(
-                  openMenuId === item.id
-                    ? null
-                    : item.id
-                )
+              onReact={(type) =>
+                handleReact(item.id, type)
+              }
+              onDelete={() =>
+                handleDelete(item.id)
               }
             />
           )}
         />
+      )}
 
-        <InsightFAB />
-      </Animated.View>
+      <InsightFAB
+        onPress={() =>
+          setShowNewInsight(true)
+        }
+      />
+
+      <NewInsightModal
+        visible={showNewInsight}
+        onClose={() => {
+          setShowNewInsight(false);
+          fetchInsights();
+        }}
+      />
     </View>
   );
-}
+});
+
+export default CommunityInsights;
 
 const styles = StyleSheet.create({
-  overlay: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 100,
-    bottom: 0,
+  content: {
+    flex: 1,
   },
 
-  sheet: {
-    position: "absolute",
-
-    left: 0,
-    right: 0,
-    bottom: 0,
-
-    height: "80%",
-
-    backgroundColor: "#F6F6F6",
-
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-
-    overflow: "hidden",
-
-    elevation: 10,
-  },
-
-  topAccent: {
-    height: 24,
-    backgroundColor: "#E7B45A",
-  },
-
-  handle: {
-    alignSelf: "center",
-
-    width: 42,
-    height: 5,
-
-    borderRadius: 999,
-
-    backgroundColor: "#D0D0D0",
-
-    marginTop: 10,
-    marginBottom: 10,
-  },
-
-  composer: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-  },
-
-  composerPrefix: {
-    fontSize: 18,
-    color: "#666",
-  },
-
-  brand: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#5F8796",
-
-    marginHorizontal: 4,
-  },
-
-  composerSuffix: {
-    fontSize: 18,
-    color: "#666",
-
-    marginBottom: 1,
+  loader: {
+    marginTop: 32,
   },
 });

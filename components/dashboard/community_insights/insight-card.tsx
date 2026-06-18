@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Alert,
   Image,
   StyleSheet,
   Text,
@@ -14,45 +15,104 @@ import { Insight } from "./types";
 
 interface Props {
   insight: Insight;
+  isOwner: boolean;
+  onReact: (type: "like" | "dislike") => void;
+  onDelete: () => void;
+}
 
-  menuVisible: boolean;
-
-  onMenuToggle: () => void;
+function timeAgo(dateStr: string): string {
+  const seconds = Math.floor(
+    (Date.now() - new Date(dateStr).getTime()) /
+      1000
+  );
+  const mins = Math.floor(seconds / 60);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
 }
 
 export default function InsightCard({
   insight,
-  menuVisible,
-  onMenuToggle,
+  isOwner,
+  onReact,
+  onDelete,
 }: Props) {
+  const { username, avatar_url } =
+    insight.profiles;
+  const liked =
+    insight.userReaction === "like";
+  const disliked =
+    insight.userReaction === "dislike";
+
+  const [menuOpen, setMenuOpen] =
+    useState(false);
+
+  const handleDelete = () => {
+    setMenuOpen(false);
+    Alert.alert(
+      "Delete insight",
+      "Are you sure you want to delete this?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: onDelete,
+        },
+      ]
+    );
+  };
+
   return (
     <View style={styles.card}>
-      <Image
-        source={{ uri: insight.avatar }}
-        style={styles.avatar}
-      />
+      {avatar_url ? (
+        <Image
+          source={{ uri: avatar_url }}
+          style={styles.avatar}
+        />
+      ) : (
+        <View
+          style={[
+            styles.avatar,
+            styles.avatarPlaceholder,
+          ]}
+        >
+          <Text style={styles.avatarInitial}>
+            {(username ?? "?")
+              .charAt(0)
+              .toUpperCase()}
+          </Text>
+        </View>
+      )}
 
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.name}>
-            {insight.userName}
-          </Text>
+          <View style={styles.nameRow}>
+            <Text style={styles.name}>
+              {username}
+            </Text>
 
-          <View>
-            <TouchableOpacity
-              onPress={onMenuToggle}
-            >
-              <Ionicons
-                name="ellipsis-horizontal"
-                size={18}
-                color="#000"
-              />
-            </TouchableOpacity>
-
-            <InsightMenu
-              visible={menuVisible}
-            />
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {insight.category}
+              </Text>
+            </View>
           </View>
+
+          <TouchableOpacity
+            onPress={() => setMenuOpen(true)}
+          >
+            <Ionicons
+              name="ellipsis-horizontal"
+              size={18}
+              color="#000"
+            />
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.message}>
@@ -61,27 +121,70 @@ export default function InsightCard({
 
         <Text style={styles.meta}>
           Route: {insight.route} •{" "}
-          {insight.timeAgo}
+          {timeAgo(insight.created_at)}
         </Text>
 
-      <View style={styles.actions}>
-        <View style={styles.actionItem}>
-          <Ionicons
-            name="thumbs-up-outline"
-            size={18}
-          />
-          <Text>{insight.likes}</Text>
-        </View>
+        <View style={styles.actions}>
+          <TouchableOpacity
+            style={styles.actionItem}
+            onPress={() => onReact("like")}
+          >
+            <Ionicons
+              name={
+                liked
+                  ? "thumbs-up"
+                  : "thumbs-up-outline"
+              }
+              size={18}
+              color={
+                liked ? "#74AFA0" : "#000"
+              }
+            />
+            <Text
+              style={
+                liked
+                  ? styles.activeCount
+                  : undefined
+              }
+            >
+              {insight.likes}
+            </Text>
+          </TouchableOpacity>
 
-        <View style={styles.actionItem}>
-          <Ionicons
-            name="thumbs-down-outline"
-            size={18}
-          />
-          <Text>{insight.dislikes}</Text>
+          <TouchableOpacity
+            style={styles.actionItem}
+            onPress={() => onReact("dislike")}
+          >
+            <Ionicons
+              name={
+                disliked
+                  ? "thumbs-down"
+                  : "thumbs-down-outline"
+              }
+              size={18}
+              color={
+                disliked ? "#E57373" : "#000"
+              }
+            />
+            <Text
+              style={
+                disliked
+                  ? styles.activeDislike
+                  : undefined
+              }
+            >
+              {insight.dislikes}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
-      </View>
+
+      <InsightMenu
+        visible={menuOpen}
+        isOwner={isOwner}
+        onClose={() => setMenuOpen(false)}
+        onDelete={handleDelete}
+      />
     </View>
   );
 }
@@ -90,12 +193,33 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     padding: 12,
+    marginHorizontal: 12,
+    marginTop: 8,
+    backgroundColor: "#FFF",
+    borderRadius: 14,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
   },
 
   avatar: {
     width: 50,
     height: 50,
     borderRadius: 25,
+  },
+
+  avatarPlaceholder: {
+    backgroundColor: "#74AFA0",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  avatarInitial: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#FFF",
   },
 
   content: {
@@ -106,11 +230,32 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+
+  nameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    flexShrink: 1,
   },
 
   name: {
     fontWeight: "600",
     color: "#74AFA0",
+  },
+
+  badge: {
+    backgroundColor: "#74AFA0",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+
+  badgeText: {
+    color: "#FFF",
+    fontSize: 10,
+    fontWeight: "600",
   },
 
   message: {
@@ -134,5 +279,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
+  },
+
+  activeCount: {
+    color: "#74AFA0",
+    fontWeight: "600",
+  },
+
+  activeDislike: {
+    color: "#E57373",
+    fontWeight: "600",
   },
 });
