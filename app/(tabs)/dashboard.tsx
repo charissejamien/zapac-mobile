@@ -240,11 +240,16 @@ export default function Dashboard() {
                   </View>
                 </View>
               ) : (
-                <>
-                  <Text style={styles.composerPrefix}>Taga</Text>
-                  <Text style={styles.brand}>ZAPAC</Text>
-                  <Text style={styles.composerSuffix}>says...</Text>
-                </>
+                <View style={styles.insightsHeader}>
+                  <View style={styles.insightsBrandRow}>
+                    <Text style={styles.composerPrefix}>Taga</Text>
+                    <Text style={styles.brand}>ZAPAC</Text>
+                    <Text style={styles.composerSuffix}>says...</Text>
+                  </View>
+                  <Text style={styles.insightsSubtitle}>
+                    Community Insights
+                  </Text>
+                </View>
               )}
             </View>
           </TouchableOpacity>
@@ -316,20 +321,37 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 12,
   },
+  insightsHeader: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  insightsBrandRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+  },
   composerPrefix: {
-    fontSize: 18,
+    fontSize: 17,
     color: "#3D3D3D",
+    marginBottom: 2,
   },
   brand: {
-    fontSize: 26,
-    fontWeight: "700",
+    fontSize: 25,
+    fontWeight: "800",
     color: "#5F8796",
     marginHorizontal: 4,
   },
   composerSuffix: {
-    fontSize: 18,
+    fontSize: 17,
     color: "#3D3D3D",
-    marginBottom: 1,
+    marginBottom: 2,
+  },
+  insightsSubtitle: {
+    fontSize: 9,
+    fontWeight: "800",
+    color: "#8A6228",
+    letterSpacing: 1.1,
+    textTransform: "uppercase",
+    marginTop: 2,
   },
   terminalsTitle: {
     fontSize: 17,

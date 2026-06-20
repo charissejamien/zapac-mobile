@@ -5,7 +5,15 @@ import React, {
   useImperativeHandle,
   useState,
 } from "react";
-import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+import { MessageCircleMore } from "lucide-react-native";
 
 import { supabase } from "@/src/lib/supabase";
 
@@ -41,6 +49,12 @@ const CommunityInsights = forwardRef<CommunityInsightsRef>((_props, ref) => {
       });
 
     if (!rows) {
+      setLoading(false);
+      return;
+    }
+
+    if (rows.length === 0) {
+      setInsights([]);
       setLoading(false);
       return;
     }
@@ -130,15 +144,43 @@ const CommunityInsights = forwardRef<CommunityInsightsRef>((_props, ref) => {
       <FilterCarousel selected={selected} onSelect={setSelected} />
 
       {loading ? (
-        <ActivityIndicator style={styles.loader} size="large" color="#74AFA0" />
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="#74AFA0" />
+          <Text style={styles.loaderText}>Loading community updates...</Text>
+        </View>
       ) : (
         <FlatList
           data={filteredInsights}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{
-            paddingBottom: 24,
-            paddingTop: 4,
-          }}
+          style={styles.list}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          scrollIndicatorInsets={{ bottom: 128 }}
+          ListHeaderComponent={
+            <View style={styles.feedHeader}>
+              <View style={styles.feedSummary}>
+                <Text style={styles.feedTitle}>Community Insights</Text>
+                <Text style={styles.insightCountText}>
+                  {filteredInsights.length}{" "}
+                  {filteredInsights.length === 1 ? "post" : "posts"}
+                </Text>
+              </View>
+              <Text style={styles.feedSubtitle}>
+                Updates shared by Cebu commuters.
+              </Text>
+            </View>
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIcon}>
+                <MessageCircleMore size={25} color="#527AAF" />
+              </View>
+              <Text style={styles.emptyTitle}>No insights here yet</Text>
+              <Text style={styles.emptyText}>
+                Be the first to share a helpful update for this category.
+              </Text>
+            </View>
+          }
           renderItem={({ item }) => (
             <InsightCard
               insight={item}
@@ -171,7 +213,83 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
+  list: {
+    flex: 1,
+  },
+
+  listContent: {
+    paddingBottom: 148,
+    paddingTop: 2,
+  },
+
+  feedHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 6,
+    paddingBottom: 10,
+  },
+
+  feedSummary: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  feedTitle: {
+    color: "#26354A",
+    fontSize: 17,
+    fontWeight: "700",
+  },
+
+  feedSubtitle: {
+    color: "#7A8795",
+    fontSize: 11,
+    lineHeight: 16,
+    marginTop: 3,
+  },
+
+  insightCountText: {
+    color: "#8A96A5",
+    fontSize: 11,
+  },
+
   loader: {
-    marginTop: 32,
+    alignItems: "center",
+    marginTop: 48,
+  },
+
+  loaderText: {
+    color: "#718096",
+    fontSize: 12,
+    marginTop: 12,
+  },
+
+  emptyState: {
+    alignItems: "center",
+    marginHorizontal: 24,
+    marginTop: 42,
+  },
+
+  emptyIcon: {
+    width: 54,
+    height: 54,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#EDF3F8",
+  },
+
+  emptyTitle: {
+    color: "#26354A",
+    fontSize: 16,
+    fontWeight: "800",
+    marginTop: 14,
+  },
+
+  emptyText: {
+    color: "#7A8795",
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: "center",
+    marginTop: 5,
   },
 });
