@@ -1,73 +1,132 @@
-import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { Search, User } from "lucide-react-native";
 import React from "react";
-import {
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 interface SearchBarProps {
-  value: string;
-  onChangeText: (text: string) => void;
+  mapRef: React.RefObject<any>;
 }
 
-export default function SearchBar({
-  value,
-  onChangeText,
-}: SearchBarProps) {
+export default function SearchBar({ mapRef }: SearchBarProps) {
+  const router = useRouter();
+
+  const GOOGLE_MAPS_API_KEY = Platform.select({
+    ios: "AIzaSyCWHublkXuYaWfT68qUwGY3o5L9NB82JA8",
+    android: "AIzaSyAJP6e_5eBGz1j8b6DEKqLT-vest54Atkc",
+  });
+
   return (
     <View style={styles.container}>
-      <Ionicons
-        name="search"
-        size={22}
-        color="#7A7A7A"
-      />
-
-      <TextInput
+      <GooglePlacesAutocomplete
         placeholder="Where to?"
-        placeholderTextColor="#7A7A7A"
-        value={value}
-        onChangeText={onChangeText}
-        style={styles.input}
+        fetchDetails={true}
+        onPress={(data, details = null) => {
+          if (details?.geometry?.location) {
+            const { lat, lng } = details.geometry.location;
+            mapRef.current?.animateToRegion(
+              {
+                latitude: lat,
+                longitude: lng,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              },
+              1000,
+            );
+          }
+        }}
+        query={{
+          key: GOOGLE_MAPS_API_KEY,
+          language: "en",
+        }}
+        renderLeftButton={() => (
+          <View style={styles.searchIcon}>
+            <Search size={22} color="#7A7A7A" />
+          </View>
+        )}
+        renderRightButton={() => (
+          <View style={styles.profileIconWrapper}>
+            <TouchableOpacity
+              style={styles.iconContainer}
+              onPress={() => router.push("/settings")}
+            >
+              <User size={18} color="#FFF" />
+            </TouchableOpacity>
+          </View>
+        )}
+        styles={{
+          textInputContainer: styles.textInputContainer,
+          textInput: styles.textInput,
+          listView: styles.listView,
+          row: styles.row,
+          description: styles.description,
+        }}
       />
-
-      <TouchableOpacity>
-        <Ionicons
-          name="happy"
-          size={28}
-          color="#6ABF4B"
-        />
-      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
-
-    backgroundColor: "#F9F9F9",
-
     marginHorizontal: 16,
     marginTop: 12,
-
-    paddingHorizontal: 14,
+    zIndex: 999,
+  },
+  textInputContainer: {
+    backgroundColor: "#F9F9F9",
     height: 56,
-
     borderRadius: 16,
-
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
     shadowColor: "#000",
     shadowOpacity: 0.12,
     shadowRadius: 5,
     elevation: 4,
   },
-
-  input: {
-    flex: 1,
-    marginLeft: 10,
+  textInput: {
+    backgroundColor: "transparent",
     fontSize: 16,
     color: "#000",
+    height: "100%",
+    paddingLeft: 10,
+    paddingRight: 10,
+    flex: 1,
+  },
+  searchIcon: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: 56,
+  },
+  profileIconWrapper: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: 56,
+  },
+  iconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#74AFA0",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  listView: {
+    backgroundColor: "#FFF",
+    borderRadius: 12,
+    marginTop: 5,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  row: {
+    padding: 13,
+    height: 44,
+    flexDirection: "row",
+  },
+  description: {
+    fontSize: 14,
+    color: "#333",
   },
 });
