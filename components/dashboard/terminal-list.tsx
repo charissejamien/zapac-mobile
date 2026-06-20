@@ -1,11 +1,19 @@
-import { Bus, Clock, Info, MapPin } from "lucide-react-native";
+import {
+  BusFront,
+  ChevronDown,
+  ChevronUp,
+  Clock3,
+  Navigation,
+  Route,
+  ShieldCheck,
+} from "lucide-react-native";
 import React, { useState } from "react";
 import {
-    FlatList,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface RouteFare {
@@ -255,51 +263,139 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
     <FlatList
       data={hardcodedTerminals}
       keyExtractor={(item) => item.id}
+      style={styles.list}
       contentContainerStyle={styles.listContent}
+      showsVerticalScrollIndicator={false}
+      scrollIndicatorInsets={{ bottom: 112 }}
+      ListHeaderComponent={
+        <View style={styles.listHeader}>
+          <View>
+            <Text style={styles.eyebrow}>CEBU COMMUTE GUIDE</Text>
+            <Text style={styles.listTitle}>Choose your terminal</Text>
+          </View>
+          <View style={styles.terminalCount}>
+            <Text style={styles.terminalCountText}>
+              {hardcodedTerminals.length}
+            </Text>
+          </View>
+        </View>
+      }
       renderItem={({ item }) => {
         const isExpanded = expandedId === item.id;
+        const routeCount = item.details.routes_fares.length;
+
         return (
-          <View style={styles.card}>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => setExpandedId(isExpanded ? null : item.id)}
-              style={styles.cardHeader}
-            >
-              <View style={styles.titleRow}>
-                <Bus size={20} color="#74AFA0" style={styles.iconGap} />
-                <Text style={styles.terminalName}>{item.name}</Text>
-              </View>
+          <View style={[styles.card, isExpanded && styles.cardExpanded]}>
+            <View style={styles.cardHeader}>
               <TouchableOpacity
-                style={styles.mapPinButton}
+                activeOpacity={0.75}
+                onPress={() => setExpandedId(isExpanded ? null : item.id)}
+                style={styles.terminalSummary}
+              >
+                <View style={styles.terminalIcon}>
+                  <BusFront size={21} color="#FFFFFF" />
+                </View>
+
+                <View style={styles.titleBlock}>
+                  <Text style={styles.terminalName}>{item.name}</Text>
+                  <View style={styles.quickMeta}>
+                    <View style={styles.statusDot} />
+                    <Text style={styles.statusText}>{item.details.status}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.expandButton}>
+                  {isExpanded ? (
+                    <ChevronUp size={19} color="#527AAF" />
+                  ) : (
+                    <ChevronDown size={19} color="#527AAF" />
+                  )}
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.destinationRow}>
+              <Route size={14} color="#5F8796" />
+              <Text style={styles.destinationText} numberOfLines={2}>
+                {item.details.routes}
+              </Text>
+            </View>
+
+            <View style={styles.cardFooter}>
+              <View style={styles.routeCountBadge}>
+                <Text style={styles.routeCountText}>
+                  {routeCount} {routeCount === 1 ? "route" : "routes"}
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.mapButton}
                 onPress={() => onSelectTerminal(item.lat, item.lng, item.name)}
               >
-                <MapPin size={18} color="#FFF" />
+                <Navigation size={14} color="#FFFFFF" />
+                <Text style={styles.mapButtonText}>View on map</Text>
               </TouchableOpacity>
-            </TouchableOpacity>
+            </View>
 
             {isExpanded && (
               <View style={styles.expandedContent}>
-                <View style={styles.metaItem}>
-                  <Clock size={14} color="#666" style={styles.iconGap} />
-                  <Text style={styles.metaText}>{item.details.status}</Text>
-                </View>
-                <View style={styles.metaItem}>
-                  <Info size={14} color="#666" style={styles.iconGap} />
-                  <Text style={styles.metaText}>{item.details.facilities}</Text>
+                <View style={styles.infoGrid}>
+                  <View style={styles.infoItem}>
+                    <View style={styles.infoIcon}>
+                      <Clock3 size={15} color="#527AAF" />
+                    </View>
+                    <View style={styles.infoCopy}>
+                      <Text style={styles.infoLabel}>Operating hours</Text>
+                      <Text style={styles.infoText}>{item.details.status}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.infoItem}>
+                    <View style={styles.infoIcon}>
+                      <ShieldCheck size={15} color="#527AAF" />
+                    </View>
+                    <View style={styles.infoCopy}>
+                      <Text style={styles.infoLabel}>Facilities</Text>
+                      <Text style={styles.infoText}>
+                        {item.details.facilities}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
 
-                <Text style={styles.sectionTitle}>Routes & Fares</Text>
+                <View style={styles.sectionHeading}>
+                  <Text style={styles.sectionTitle}>Routes & fares</Text>
+                  <Text style={styles.sectionHint}>Estimated minimum fare</Text>
+                </View>
+
                 {item.details.routes_fares.map((rf, idx) => (
-                  <View key={idx} style={styles.fareRow}>
-                    <View style={styles.fareRouteContainer}>
+                  <View
+                    key={`${rf.route}-${rf.vehicle_code ?? idx}`}
+                    style={styles.fareRow}
+                  >
+                    <View style={styles.routeDetails}>
                       {rf.vehicle_code && (
-                        <Text style={styles.vehicleBadge}>
-                          {rf.vehicle_code}
-                        </Text>
+                        <View style={styles.vehicleBadge}>
+                          <Text style={styles.vehicleBadgeText}>
+                            {rf.vehicle_code.toUpperCase()}
+                          </Text>
+                        </View>
                       )}
-                      <Text style={styles.fareRouteText}>{rf.route}</Text>
+                      <View style={styles.routeCopy}>
+                        <Text style={styles.fareRouteText}>{rf.route}</Text>
+                        {rf.stops && (
+                          <Text style={styles.stopsText} numberOfLines={2}>
+                            {rf.stops}
+                          </Text>
+                        )}
+                      </View>
                     </View>
-                    <Text style={styles.fareAmount}>{rf.fare}</Text>
+                    <View style={styles.farePill}>
+                      <Text style={styles.fareAmount}>
+                        {rf.fare.replace("P ", "₱")}
+                      </Text>
+                    </View>
                   </View>
                 ))}
               </View>
@@ -312,106 +408,272 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
 }
 
 const styles = StyleSheet.create({
+  list: {
+    flex: 1,
+  },
   listContent: {
-    paddingHorizontal: 14,
-    paddingBottom: 32,
-    paddingTop: 8,
+    paddingHorizontal: 16,
+    paddingBottom: 140,
+    paddingTop: 14,
+  },
+  listHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 14,
+    paddingHorizontal: 2,
+  },
+  eyebrow: {
+    color: "#74AFA0",
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 1.2,
+    marginBottom: 3,
+  },
+  listTitle: {
+    color: "#26354A",
+    fontSize: 20,
+    fontWeight: "800",
+  },
+  terminalCount: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#E7F2EF",
+  },
+  terminalCountText: {
+    color: "#4E8C7D",
+    fontSize: 14,
+    fontWeight: "800",
   },
   card: {
     backgroundColor: "#FFF",
-    borderRadius: 14,
-    padding: 12,
-    marginBottom: 10,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
+    borderRadius: 20,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#E9EEF3",
+    elevation: 3,
+    shadowColor: "#28415E",
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
-    shadowRadius: 4,
+    shadowRadius: 8,
+  },
+  cardExpanded: {
+    borderColor: "#BFD4DE",
+    shadowOpacity: 0.12,
   },
   cardHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
   },
-  titleRow: {
+  terminalSummary: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
-    marginRight: 8,
   },
-  iconGap: {
-    marginRight: 8,
+  terminalIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#74AFA0",
+  },
+  titleBlock: {
+    flex: 1,
+    marginLeft: 11,
   },
   terminalName: {
     fontSize: 15,
-    fontWeight: "600",
-    color: "#333",
+    lineHeight: 20,
+    fontWeight: "800",
+    color: "#26354A",
   },
-  mapPinButton: {
+  quickMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 3,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#74AFA0",
+    marginRight: 5,
+  },
+  statusText: {
+    flex: 1,
+    fontSize: 11,
+    color: "#718096",
+  },
+  expandButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#74AFA0",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#EDF3F8",
+    marginLeft: 8,
+  },
+  destinationRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 7,
+    backgroundColor: "#F6F9FB",
+    borderRadius: 12,
+    marginTop: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+  },
+  destinationText: {
+    flex: 1,
+    color: "#536274",
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  cardFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 11,
+  },
+  routeCountBadge: {
+    backgroundColor: "#FFF4E2",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  routeCountText: {
+    color: "#A66A19",
+    fontSize: 11,
+    fontWeight: "700",
+  },
+  mapButton: {
+    flexDirection: "row",
+    gap: 6,
+    borderRadius: 999,
+    backgroundColor: "#527AAF",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     justifyContent: "center",
     alignItems: "center",
   },
-  expandedContent: {
-    marginTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#EEE",
-    paddingTop: 10,
-  },
-  metaItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 6,
-  },
-  metaText: {
-    fontSize: 13,
-    color: "#555",
-  },
-  sectionTitle: {
-    fontSize: 13,
+  mapButtonText: {
+    color: "#FFFFFF",
+    fontSize: 11,
     fontWeight: "700",
-    color: "#74AFA0",
-    marginTop: 10,
-    marginBottom: 6,
+  },
+  expandedContent: {
+    marginTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: "#E9EEF3",
+    paddingTop: 14,
+  },
+  infoGrid: {
+    gap: 10,
+  },
+  infoItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  infoIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#EDF3F8",
+    marginRight: 9,
+  },
+  infoCopy: {
+    flex: 1,
+  },
+  infoLabel: {
+    color: "#8A96A5",
+    fontSize: 10,
+    fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 0.5,
+  },
+  infoText: {
+    color: "#3F4C5C",
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 2,
+  },
+  sectionHeading: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    marginTop: 18,
+    marginBottom: 8,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#26354A",
+  },
+  sectionHint: {
+    fontSize: 9,
+    color: "#99A3AF",
   },
   fareRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 5,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#F0F0F0",
+    alignItems: "flex-start",
+    backgroundColor: "#F8FAFC",
+    padding: 10,
+    borderRadius: 12,
+    marginBottom: 7,
   },
-  fareRouteContainer: {
+  routeDetails: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     flex: 1,
     marginRight: 10,
   },
   vehicleBadge: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: "#FFF",
+    minWidth: 36,
+    height: 24,
+    borderRadius: 8,
     backgroundColor: "#5F8796",
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    borderRadius: 4,
-    overflow: "hidden",
-    marginRight: 6,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 5,
+    marginRight: 8,
   },
-  fareRouteText: {
-    fontSize: 13,
-    color: "#333",
+  vehicleBadgeText: {
+    fontSize: 9,
+    fontWeight: "800",
+    color: "#FFFFFF",
+  },
+  routeCopy: {
     flex: 1,
   },
-  fareAmount: {
-    fontSize: 13,
+  fareRouteText: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: "#344255",
     fontWeight: "600",
-    color: "#E57373",
+  },
+  stopsText: {
+    color: "#8A96A5",
+    fontSize: 10,
+    lineHeight: 14,
+    marginTop: 3,
+  },
+  farePill: {
+    borderRadius: 999,
+    backgroundColor: "#E7F2EF",
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+  },
+  fareAmount: {
+    fontSize: 11,
+    fontWeight: "800",
+    color: "#397968",
   },
 });

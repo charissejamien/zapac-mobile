@@ -11,6 +11,7 @@ import {
 
 import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
+import { BusFront } from "lucide-react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 import CommunityInsights, {
@@ -31,7 +32,6 @@ const EXPANDED_Y = 120;
 const SWIPE_THRESHOLD = 60;
 
 export default function Dashboard() {
-  const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"insights" | "terminals">(
     "insights",
   );
@@ -177,7 +177,24 @@ export default function Dashboard() {
               longitude: selectedTerminal.longitude,
             }}
             title={selectedTerminal.title}
-          />
+            anchor={{ x: 0.5, y: 1 }}
+          >
+            <View style={styles.markerWrapper}>
+              <View style={styles.markerLabel}>
+                <Text style={styles.markerLabelText} numberOfLines={1}>
+                  {selectedTerminal.title}
+                </Text>
+              </View>
+
+              <View style={styles.markerHalo}>
+                <View style={styles.markerBadge}>
+                  <BusFront size={21} color="#FFFFFF" />
+                </View>
+              </View>
+
+              <View style={styles.markerTip} />
+            </View>
+          </Marker>
         )}
       </MapView>
 
@@ -186,7 +203,10 @@ export default function Dashboard() {
       </View>
 
       <View style={styles.buttonGroup}>
-        <TerminalButton onPress={toggleTerminalView} />
+        <TerminalButton
+          active={activeTab === "terminals"}
+          onPress={toggleTerminalView}
+        />
         <LocatorButton mapRef={mapRef} />
       </View>
 
@@ -208,7 +228,17 @@ export default function Dashboard() {
 
             <View style={styles.composer}>
               {activeTab === "terminals" ? (
-                <Text style={styles.terminalsTitle}>Terminals in Cebu</Text>
+                <View style={styles.terminalHeader}>
+                  <View style={styles.terminalHeaderIcon}>
+                    <BusFront size={18} color="#FFFFFF" />
+                  </View>
+                  <View>
+                    <Text style={styles.terminalsTitle}>Cebu terminals</Text>
+                    <Text style={styles.terminalsSubtitle}>
+                      Routes, fares, and terminal details
+                    </Text>
+                  </View>
+                </View>
               ) : (
                 <>
                   <Text style={styles.composerPrefix}>Taga</Text>
@@ -254,7 +284,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     height: SHEET_HEIGHT,
-    backgroundColor: "#F6F6F6",
+    backgroundColor: "#F5F7F9",
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     overflow: "hidden",
@@ -302,9 +332,84 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
   terminalsTitle: {
-    fontSize: 18,
+    fontSize: 17,
+    fontWeight: "800",
+    color: "#26354A",
+  },
+  terminalsSubtitle: {
+    fontSize: 10,
+    color: "#715B38",
+    marginTop: 1,
+  },
+  terminalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  terminalHeaderIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 11,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#74AFA0",
+    marginRight: 9,
+  },
+  markerWrapper: {
+    alignItems: "center",
+    width: 190,
+  },
+  markerLabel: {
+    maxWidth: 180,
+    borderRadius: 10,
+    backgroundColor: "#26354A",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginBottom: 5,
+    shadowColor: "#26354A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  markerLabelText: {
+    color: "#FFFFFF",
+    fontSize: 11,
     fontWeight: "700",
-    color: "#3D3D3D",
-    paddingVertical: 4,
+    textAlign: "center",
+  },
+  markerHalo: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(116, 175, 160, 0.24)",
+  },
+  markerBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#74AFA0",
+    borderWidth: 3,
+    borderColor: "#FFFFFF",
+    shadowColor: "#26354A",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 6,
+  },
+  markerTip: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 7,
+    borderRightWidth: 7,
+    borderTopWidth: 9,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderTopColor: "#74AFA0",
+    marginTop: -5,
   },
 });
