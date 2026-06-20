@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 
-import { Ionicons } from "@expo/vector-icons";
+import { MoreHorizontal, ThumbsDown, ThumbsUp } from "lucide-react-native";
 
 import InsightMenu from "./insight-menu";
 import { Insight } from "./types";
@@ -21,10 +21,7 @@ interface Props {
 }
 
 function timeAgo(dateStr: string): string {
-  const seconds = Math.floor(
-    (Date.now() - new Date(dateStr).getTime()) /
-      1000
-  );
+  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
   const mins = Math.floor(seconds / 60);
   if (mins < 1) return "Just now";
   if (mins < 60) return `${mins}m ago`;
@@ -42,50 +39,32 @@ export default function InsightCard({
   onReact,
   onDelete,
 }: Props) {
-  const { username, avatar_url } =
-    insight.profiles;
-  const liked =
-    insight.userReaction === "like";
-  const disliked =
-    insight.userReaction === "dislike";
+  const { username, avatar_url } = insight.profiles;
+  const liked = insight.userReaction === "like";
+  const disliked = insight.userReaction === "dislike";
 
-  const [menuOpen, setMenuOpen] =
-    useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleDelete = () => {
     setMenuOpen(false);
-    Alert.alert(
-      "Delete insight",
-      "Are you sure you want to delete this?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: onDelete,
-        },
-      ]
-    );
+    Alert.alert("Delete insight", "Are you sure you want to delete this?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: onDelete,
+      },
+    ]);
   };
 
   return (
     <View style={styles.card}>
       {avatar_url ? (
-        <Image
-          source={{ uri: avatar_url }}
-          style={styles.avatar}
-        />
+        <Image source={{ uri: avatar_url }} style={styles.avatar} />
       ) : (
-        <View
-          style={[
-            styles.avatar,
-            styles.avatarPlaceholder,
-          ]}
-        >
+        <View style={[styles.avatar, styles.avatarPlaceholder]}>
           <Text style={styles.avatarInitial}>
-            {(username ?? "?")
-              .charAt(0)
-              .toUpperCase()}
+            {(username ?? "?").charAt(0).toUpperCase()}
           </Text>
         </View>
       )}
@@ -93,35 +72,22 @@ export default function InsightCard({
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.nameRow}>
-            <Text style={styles.name}>
-              {username}
-            </Text>
+            <Text style={styles.name}>{username}</Text>
 
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>
-                {insight.category}
-              </Text>
+              <Text style={styles.badgeText}>{insight.category}</Text>
             </View>
           </View>
 
-          <TouchableOpacity
-            onPress={() => setMenuOpen(true)}
-          >
-            <Ionicons
-              name="ellipsis-horizontal"
-              size={18}
-              color="#000"
-            />
+          <TouchableOpacity onPress={() => setMenuOpen(true)}>
+            <MoreHorizontal size={18} color="#000" />
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.message}>
-          {insight.content}
-        </Text>
+        <Text style={styles.message}>{insight.content}</Text>
 
         <Text style={styles.meta}>
-          Route: {insight.route} •{" "}
-          {timeAgo(insight.created_at)}
+          Route: {insight.route} • {timeAgo(insight.created_at)}
         </Text>
 
         <View style={styles.actions}>
@@ -129,24 +95,8 @@ export default function InsightCard({
             style={styles.actionItem}
             onPress={() => onReact("like")}
           >
-            <Ionicons
-              name={
-                liked
-                  ? "thumbs-up"
-                  : "thumbs-up-outline"
-              }
-              size={18}
-              color={
-                liked ? "#74AFA0" : "#000"
-              }
-            />
-            <Text
-              style={
-                liked
-                  ? styles.activeCount
-                  : undefined
-              }
-            >
+            <ThumbsUp size={18} color={liked ? "#74AFA0" : "#000"} />
+            <Text style={liked ? styles.activeCount : undefined}>
               {insight.likes}
             </Text>
           </TouchableOpacity>
@@ -155,24 +105,8 @@ export default function InsightCard({
             style={styles.actionItem}
             onPress={() => onReact("dislike")}
           >
-            <Ionicons
-              name={
-                disliked
-                  ? "thumbs-down"
-                  : "thumbs-down-outline"
-              }
-              size={18}
-              color={
-                disliked ? "#E57373" : "#000"
-              }
-            />
-            <Text
-              style={
-                disliked
-                  ? styles.activeDislike
-                  : undefined
-              }
-            >
+            <ThumbsDown size={18} color={disliked ? "#E57373" : "#000"} />
+            <Text style={disliked ? styles.activeDislike : undefined}>
               {insight.dislikes}
             </Text>
           </TouchableOpacity>
