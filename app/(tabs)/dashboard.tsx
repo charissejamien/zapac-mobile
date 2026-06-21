@@ -35,7 +35,16 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<"insights" | "terminals">(
     "insights",
   );
+
+  // Terminal Marker Selection State
   const [selectedTerminal, setSelectedTerminal] = useState<{
+    latitude: number;
+    longitude: number;
+    title: string;
+  } | null>(null);
+
+  // FIXED: Declared missing searchedPlace state variable
+  const [searchedPlace, setSearchedPlace] = useState<{
     latitude: number;
     longitude: number;
     title: string;
@@ -98,12 +107,14 @@ export default function Dashboard() {
       setSelectedTerminal(null); // Clear terminal marker when returning to insights
     } else {
       setActiveTab("terminals");
+      setSearchedPlace(null); // Clear active search marker when switching to terminals view
       snapTo(EXPANDED_Y); // Open sheet instantly to reveal listings
     }
   };
 
   const handleSelectTerminal = (lat: number, lng: number, name: string) => {
     snapTo(MINIMIZED_Y);
+    setSearchedPlace(null); // Clear regular search marker to avoid overlap confusion
     setSelectedTerminal({
       latitude: lat,
       longitude: lng,
@@ -116,6 +127,26 @@ export default function Dashboard() {
         longitude: lng,
         latitudeDelta: 0.008,
         longitudeDelta: 0.008,
+      },
+      1000,
+    );
+  };
+
+  // Callback to receive searched location from <SearchBar />
+  const handleSelectPlace = (lat: number, lng: number, name: string) => {
+    setSelectedTerminal(null); // Clear active terminal pin markers
+    setSearchedPlace({
+      latitude: lat,
+      longitude: lng,
+      title: name,
+    });
+
+    mapRef.current?.animateToRegion(
+      {
+        latitude: lat,
+        longitude: lng,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
       },
       1000,
     );
@@ -170,19 +201,36 @@ export default function Dashboard() {
           longitudeDelta: 0.02,
         }}
       >
+        {/* Terminal Marker Selection */}
         {selectedTerminal && (
           <Marker
+            key={`terminal-${selectedTerminal.latitude}-${selectedTerminal.longitude}`}
             coordinate={{
               latitude: selectedTerminal.latitude,
               longitude: selectedTerminal.longitude,
             }}
             title={selectedTerminal.title}
+            pinColor="#74AFA0"
+          />
+        )}
+
+        {/* Autocomplete Searched Location Marker */}
+        {searchedPlace && (
+          <Marker
+            key={`search-${searchedPlace.latitude}-${searchedPlace.longitude}`}
+            coordinate={{
+              latitude: searchedPlace.latitude,
+              longitude: searchedPlace.longitude,
+            }}
+            title={searchedPlace.title}
+            pinColor="red"
           />
         )}
       </MapView>
 
       <View style={styles.searchContainer}>
-        <SearchBar mapRef={mapRef} />
+        {/* FIXED: Added onSelectPlace prop binding here */}
+        <SearchBar mapRef={mapRef} onSelectPlace={handleSelectPlace} />
       </View>
 
       <View style={styles.buttonGroup}>
@@ -239,7 +287,8 @@ const styles = StyleSheet.create({
     top: 50,
     left: 0,
     right: 0,
-    zIndex: 100,
+    zIndex: 9999,
+    overflow: "visible",
   },
   buttonGroup: {
     position: "absolute",

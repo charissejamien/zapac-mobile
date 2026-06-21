@@ -6,9 +6,10 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 
 interface SearchBarProps {
   mapRef: React.RefObject<any>;
+  onSelectPlace?: (lat: number, lng: number, name: string) => void;
 }
 
-export default function SearchBar({ mapRef }: SearchBarProps) {
+export default function SearchBar({ mapRef, onSelectPlace }: SearchBarProps) {
   const router = useRouter();
 
   const GOOGLE_MAPS_API_KEY = Platform.select({
@@ -24,21 +25,33 @@ export default function SearchBar({ mapRef }: SearchBarProps) {
         onPress={(data, details = null) => {
           if (details?.geometry?.location) {
             const { lat, lng } = details.geometry.location;
-            mapRef.current?.animateToRegion(
-              {
-                latitude: lat,
-                longitude: lng,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              },
-              1000,
-            );
+
+            if (onSelectPlace) {
+              onSelectPlace(lat, lng, data.description);
+            } else {
+              mapRef.current?.animateToRegion(
+                {
+                  latitude: lat,
+                  longitude: lng,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                },
+                1000,
+              );
+            }
           }
         }}
         query={{
           key: GOOGLE_MAPS_API_KEY,
           language: "en",
+          components: "country:ph",
+          location: "10.3157,123.8854",
+          radius: "50000",
+          strictbounds: true,
         }}
+        nearbyPlacesAPI="GooglePlacesSearch"
+        enablePoweredByContainer={false}
+        keyboardShouldPersistTaps="handled"
         renderLeftButton={() => (
           <View style={styles.searchIcon}>
             <Search size={22} color="#7A7A7A" />
@@ -70,7 +83,7 @@ const styles = StyleSheet.create({
   container: {
     marginHorizontal: 16,
     marginTop: 12,
-    zIndex: 999,
+    zIndex: 99999,
   },
   textInputContainer: {
     backgroundColor: "#F9F9F9",
@@ -119,11 +132,17 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 3,
+    position: "absolute",
+    top: 60,
+    left: 0,
+    right: 0,
+    zIndex: 99999,
   },
   row: {
     padding: 13,
     height: 44,
     flexDirection: "row",
+    backgroundColor: "#FFF",
   },
   description: {
     fontSize: 14,
