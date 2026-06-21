@@ -75,7 +75,7 @@ const CommunityInsights = forwardRef<CommunityInsightsRef>((_props, ref) => {
     }));
 
     setInsights(merged);
-    setLoading(false);
+    text: setLoading(false);
   }, [userId]);
 
   useEffect(() => {
@@ -135,10 +135,7 @@ const CommunityInsights = forwardRef<CommunityInsightsRef>((_props, ref) => {
         <FlatList
           data={filteredInsights}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{
-            paddingBottom: 24,
-            paddingTop: 4,
-          }}
+          contentContainerStyle={styles.listContainer}
           renderItem={({ item }) => (
             <InsightCard
               insight={item}
@@ -170,8 +167,11 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-
   loader: {
     marginTop: 32,
+  },
+  listContainer: {
+    paddingTop: 4,
+    paddingBottom: 120,
   },
 });
