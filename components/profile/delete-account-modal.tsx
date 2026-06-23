@@ -13,6 +13,7 @@ import {
 } from "react-native";
 
 import { SETTINGS_COLORS } from "@/components/settings/settings-theme";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 type DeleteAccountModalProps = {
   onClose: () => void;
@@ -25,6 +26,7 @@ export function DeleteAccountModal({
   onDelete,
   visible,
 }: DeleteAccountModalProps) {
+  const { colors } = useAppTheme();
   const [step, setStep] = useState<1 | 2>(1);
   const [confirmation, setConfirmation] = useState("");
 
@@ -44,29 +46,38 @@ export function DeleteAccountModal({
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.overlay}
+        style={[styles.overlay, { backgroundColor: colors.overlay }]}
       >
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: colors.surfaceElevated }]}>
           {step === 1 ? (
             <>
-              <View style={styles.warningIcon}>
+              <View
+                style={[
+                  styles.warningIcon,
+                  { backgroundColor: colors.dangerSoft },
+                ]}
+              >
                 <Feather
                   name="trash-2"
                   size={22}
                   color={SETTINGS_COLORS.red}
                 />
               </View>
-              <Text style={styles.title}>Delete Account?</Text>
-              <Text style={styles.body}>
+              <Text style={[styles.title, { color: colors.text }]}>
+                Delete Account?
+              </Text>
+              <Text style={[styles.body, { color: colors.textMuted }]}>
                 This permanently deletes your account and all associated data.
                 This action cannot be undone.
               </Text>
             </>
           ) : (
             <>
-              <Text style={styles.title}>Confirm Deletion</Text>
-              <Text style={styles.body}>
+              <Text style={[styles.title, { color: colors.text }]}>
+                Confirm Deletion
+              </Text>
+              <Text style={[styles.body, { color: colors.textMuted }]}>
                 Type <Text style={styles.deleteWord}>DELETE</Text> to
                 permanently delete your account.
               </Text>
@@ -77,7 +88,14 @@ export function DeleteAccountModal({
                 onChangeText={setConfirmation}
                 placeholder="Type DELETE"
                 placeholderTextColor="#AAAAAA"
-                style={styles.input}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: colors.input,
+                    borderColor: colors.border,
+                    color: colors.text,
+                  },
+                ]}
                 value={confirmation}
               />
             </>
@@ -85,7 +103,9 @@ export function DeleteAccountModal({
 
           <View style={styles.actions}>
             <TouchableOpacity onPress={onClose} style={styles.cancel}>
-              <Text style={styles.cancelText}>Cancel</Text>
+              <Text style={[styles.cancelText, { color: colors.textMuted }]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               disabled={step === 2 && confirmation !== "DELETE"}
@@ -98,6 +118,7 @@ export function DeleteAccountModal({
               }}
               style={[
                 styles.deleteButton,
+                { backgroundColor: colors.danger },
                 step === 2 &&
                   confirmation !== "DELETE" &&
                   styles.disabledButton,

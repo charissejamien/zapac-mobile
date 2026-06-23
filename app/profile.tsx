@@ -21,8 +21,10 @@ import { ProfileHeader } from "@/components/profile/profile-header";
 import { EditableProfileField } from "@/components/profile/profile-types";
 import { useProfile } from "@/components/profile/use-profile";
 import { SETTINGS_COLORS } from "@/components/settings/settings-theme";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 export default function ProfileScreen() {
+  const { colors } = useAppTheme();
   const { deleteAccount, profile, updateProfile } = useProfile();
   const [editing, setEditing] = useState<EditableProfileField | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -41,7 +43,7 @@ export default function ProfileScreen() {
   const currentDate = new Date(`${profile.dob}T00:00:00`);
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <StatusBar style="light" />
       <ProfileHeader
         email={profile.email}
@@ -50,7 +52,9 @@ export default function ProfileScreen() {
       />
 
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.sectionTitle}>PERSONAL DETAILS</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>
+          PERSONAL DETAILS
+        </Text>
 
         <ProfileDetailRow
           icon={<Feather name="user" size={18} color={SETTINGS_COLORS.icon} />}
@@ -83,7 +87,7 @@ export default function ProfileScreen() {
           value={profile.dob}
         />
         {showDatePicker && (
-          <View style={styles.datePicker}>
+          <View style={[styles.datePicker, { backgroundColor: colors.surface }]}>
             <DateTimePicker
               display={Platform.OS === "ios" ? "inline" : "default"}
               maximumDate={new Date()}
@@ -96,7 +100,10 @@ export default function ProfileScreen() {
             {Platform.OS === "ios" && (
               <TouchableOpacity
                 onPress={() => setShowDatePicker(false)}
-                style={styles.dateDoneButton}
+                style={[
+                  styles.dateDoneButton,
+                  { backgroundColor: colors.primary },
+                ]}
               >
                 <Text style={styles.dateDoneText}>Done</Text>
               </TouchableOpacity>
@@ -104,16 +111,28 @@ export default function ProfileScreen() {
           </View>
         )}
 
-        <Text style={[styles.sectionTitle, styles.accountTitle]}>ACCOUNT</Text>
+        <Text
+          style={[
+            styles.sectionTitle,
+            styles.accountTitle,
+            { color: colors.textMuted },
+          ]}
+        >
+          ACCOUNT
+        </Text>
         <TouchableOpacity
           activeOpacity={0.75}
           onPress={() => setDeleteModalVisible(true)}
-          style={styles.deleteRow}
+          style={[styles.deleteRow, { backgroundColor: colors.surface }]}
         >
-          <View style={styles.deleteIcon}>
+          <View
+            style={[styles.deleteIcon, { backgroundColor: colors.dangerSoft }]}
+          >
             <Feather name="trash-2" size={18} color={SETTINGS_COLORS.red} />
           </View>
-          <Text style={styles.deleteLabel}>Delete Account</Text>
+          <Text style={[styles.deleteLabel, { color: colors.danger }]}>
+            Delete Account
+          </Text>
           <Feather name="chevron-right" size={19} color="#989898" />
         </TouchableOpacity>
       </ScrollView>

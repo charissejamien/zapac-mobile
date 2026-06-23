@@ -22,9 +22,10 @@ import { SettingsHeader } from "@/components/settings/settings-header";
 import { SettingsRow } from "@/components/settings/settings-row";
 import { SettingsSection } from "@/components/settings/settings-section";
 import { SETTINGS_COLORS } from "@/components/settings/settings-theme";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 export default function SettingsScreen() {
-  const [darkMode, setDarkMode] = useState(false);
+  const { colors, isDark, setDarkMode } = useAppTheme();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -157,7 +158,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View style={[styles.screen, darkMode && styles.darkScreen]}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <StatusBar style="light" />
       <SettingsHeader
         email={email}
@@ -182,10 +183,17 @@ export default function SettingsScreen() {
             style={modalStyles.backdrop}
             onPress={() => setEditingUsername(false)}
           />
-          <View style={modalStyles.card}>
-            <Text style={modalStyles.title}>Edit Username</Text>
+          <View style={[modalStyles.card, { backgroundColor: colors.surfaceElevated }]}>
+            <Text style={[modalStyles.title, { color: colors.text }]}>Edit Username</Text>
             <TextInput
-              style={modalStyles.input}
+              style={[
+                modalStyles.input,
+                {
+                  backgroundColor: colors.input,
+                  borderColor: colors.border,
+                  color: colors.text,
+                },
+              ]}
               value={draftUsername}
               onChangeText={setDraftUsername}
               autoFocus
@@ -221,9 +229,9 @@ export default function SettingsScreen() {
             style={modalStyles.backdrop}
             onPress={() => setDeleteStep(0)}
           />
-          <View style={modalStyles.card}>
-            <Text style={modalStyles.title}>Delete Account?</Text>
-            <Text style={modalStyles.body}>
+          <View style={[modalStyles.card, { backgroundColor: colors.surfaceElevated }]}>
+            <Text style={[modalStyles.title, { color: colors.text }]}>Delete Account?</Text>
+            <Text style={[modalStyles.body, { color: colors.textMuted }]}>
               This will permanently delete your account and all associated data.
               This action cannot be undone.
             </Text>
@@ -263,9 +271,9 @@ export default function SettingsScreen() {
             style={modalStyles.backdrop}
             onPress={() => setDeleteStep(0)}
           />
-          <View style={modalStyles.card}>
-            <Text style={modalStyles.title}>Confirm Deletion</Text>
-            <Text style={modalStyles.body}>
+          <View style={[modalStyles.card, { backgroundColor: colors.surfaceElevated }]}>
+            <Text style={[modalStyles.title, { color: colors.text }]}>Confirm Deletion</Text>
+            <Text style={[modalStyles.body, { color: colors.textMuted }]}>
               Type{" "}
               <Text style={{ fontWeight: "700", color: "#E53935" }}>
                 DELETE
@@ -273,7 +281,14 @@ export default function SettingsScreen() {
               to permanently delete your account.
             </Text>
             <TextInput
-              style={modalStyles.input}
+              style={[
+                modalStyles.input,
+                {
+                  backgroundColor: colors.input,
+                  borderColor: colors.border,
+                  color: colors.text,
+                },
+              ]}
               value={deleteConfirmText}
               onChangeText={setDeleteConfirmText}
               autoFocus
@@ -308,17 +323,15 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        <SettingsSection darkMode={darkMode} title="PREFERENCES">
+        <SettingsSection title="PREFERENCES">
           <SettingsRow
-            darkMode={darkMode}
             icon={<Feather name="sun" size={18} color={SETTINGS_COLORS.icon} />}
             label="Dark Mode"
             onToggle={setDarkMode}
             showChevron={false}
-            value={darkMode}
+            value={isDark}
           />
           <SettingsRow
-            darkMode={darkMode}
             icon={
               <Ionicons
                 name="notifications"
@@ -331,9 +344,8 @@ export default function SettingsScreen() {
           />
         </SettingsSection>
 
-        <SettingsSection darkMode={darkMode} title="SUPPORT">
+        <SettingsSection title="SUPPORT">
           <SettingsRow
-            darkMode={darkMode}
             icon={
               <Feather
                 name="help-circle"
@@ -345,7 +357,6 @@ export default function SettingsScreen() {
             onPress={() => router.push("/settings/help-feedback")}
           />
           <SettingsRow
-            darkMode={darkMode}
             icon={
               <Feather name="info" size={18} color={SETTINGS_COLORS.icon} />
             }
@@ -354,9 +365,8 @@ export default function SettingsScreen() {
           />
         </SettingsSection>
 
-        <SettingsSection darkMode={darkMode} title="ACCOUNT">
+        <SettingsSection title="ACCOUNT">
           <SettingsRow
-            darkMode={darkMode}
             destructive
             icon={
               <Feather name="trash-2" size={18} color={SETTINGS_COLORS.red} />
@@ -365,7 +375,6 @@ export default function SettingsScreen() {
             onPress={() => setDeleteStep(1)}
           />
           <SettingsRow
-            darkMode={darkMode}
             destructive
             icon={
               <MaterialCommunityIcons
@@ -463,8 +472,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingTop: 20,
     paddingBottom: 24,
-  },
-  darkScreen: {
-    backgroundColor: SETTINGS_COLORS.darkBackground,
   },
 });

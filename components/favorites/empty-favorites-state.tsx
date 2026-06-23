@@ -1,10 +1,13 @@
 import { Platform, StyleSheet, Text, View } from "react-native";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 export function EmptyFavoritesState() {
+  const { colors } = useAppTheme();
+
   return (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyText}>You have no favorite routes yet.</Text>
-      <Text style={styles.emptyText}>Click the + icon to add one!</Text>
+      <Text style={[styles.emptyText, { color: colors.text }]}>You have no favorite routes yet.</Text>
+      <Text style={[styles.emptyText, { color: colors.text }]}>Click the + icon to add one!</Text>
     </View>
   );
 }

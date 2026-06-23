@@ -12,8 +12,10 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 export default function ForgotPasswordScreen() {
+  const { colors } = useAppTheme();
   const [email, setEmail] = useState('');
   const [headerHeight, setHeaderHeight] = useState(0);
   const insets = useSafeAreaInsets();
@@ -25,6 +27,7 @@ export default function ForgotPasswordScreen() {
         <View className="flex-1">
           <KeyboardAvoidingView
             className="flex-1 bg-white"
+            style={{ backgroundColor: colors.background }}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           >
             <ScrollView
@@ -40,17 +43,18 @@ export default function ForgotPasswordScreen() {
                 <Text className="text-[32px] font-bold text-accent-green mb-3">
                   Forgot Password?
                 </Text>
-                <Text className="text-sm text-[#666] leading-5 mb-8">
-                  Enter the email associated with your account and we'll send a code to your email to reset your password.
+                <Text className="text-sm text-[#666] leading-5 mb-8" style={{ color: colors.textMuted }}>
+                  Enter the email associated with your account and we&apos;ll send a code to your email to reset your password.
                 </Text>
 
-                <Text className="text-sm text-[#333] font-medium mb-[7px]">Email</Text>
+                <Text className="text-sm text-[#333] font-medium mb-[7px]" style={{ color: colors.text }}>Email</Text>
                 <TextInput
                   className="bg-input-bg rounded-[12px] px-[14px] h-[56px] w-full text-base text-[#1A1A1A] mb-8"
+                  style={{ backgroundColor: colors.input, color: colors.text }}
                   value={email}
                   onChangeText={setEmail}
                   placeholder="Enter Email"
-                  placeholderTextColor="#AAA"
+                  placeholderTextColor={colors.textMuted}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}

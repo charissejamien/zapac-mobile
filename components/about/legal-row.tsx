@@ -2,6 +2,7 @@ import { Feather } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { ABOUT_COLORS } from './about-theme';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 type LegalRowProps = {
   icon: keyof typeof Feather.glyphMap;
@@ -10,13 +11,14 @@ type LegalRowProps = {
 };
 
 export function LegalRow({ icon, label, onPress }: LegalRowProps) {
+  const { colors } = useAppTheme();
   return (
-    <TouchableOpacity activeOpacity={0.75} onPress={onPress} style={styles.row}>
+    <TouchableOpacity activeOpacity={0.75} onPress={onPress} style={[styles.row, { backgroundColor: colors.surface }]}>
       <View style={styles.rowStart}>
-        <View style={styles.iconBox}>
+        <View style={[styles.iconBox, { backgroundColor: colors.primarySoft }]}>
           <Feather name={icon} size={17} color={ABOUT_COLORS.blue} />
         </View>
-        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
       </View>
       <Feather name="chevron-right" size={19} color="#9BA2AA" />
     </TouchableOpacity>

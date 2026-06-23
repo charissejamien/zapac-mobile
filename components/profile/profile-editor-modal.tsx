@@ -11,6 +11,7 @@ import {
 
 import { EditableProfileField } from "@/components/profile/profile-types";
 import { SETTINGS_COLORS } from "@/components/settings/settings-theme";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 const GENDER_OPTIONS = ["Female", "Male", "Prefer not to say"];
 
@@ -27,6 +28,7 @@ export function ProfileEditorModal({
   onSave,
   value,
 }: ProfileEditorModalProps) {
+  const { colors } = useAppTheme();
   const [draft, setDraft] = useState(value);
 
   useEffect(() => {
@@ -40,10 +42,10 @@ export function ProfileEditorModal({
       transparent
       visible={field !== null}
     >
-      <View style={styles.overlay}>
+      <View style={[styles.overlay, { backgroundColor: colors.overlay }]}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onCancel} />
-        <View style={styles.card}>
-          <Text style={styles.title}>
+        <View style={[styles.card, { backgroundColor: colors.surfaceElevated }]}>
+          <Text style={[styles.title, { color: colors.text }]}>
             Edit {field === "gender" ? "Gender" : "Full Name"}
           </Text>
 
@@ -55,12 +57,18 @@ export function ProfileEditorModal({
                   onPress={() => setDraft(option)}
                   style={[
                     styles.genderOption,
+                    { borderColor: colors.border },
                     draft === option && styles.genderOptionSelected,
+                    draft === option && {
+                      backgroundColor: colors.primarySoft,
+                      borderColor: colors.primary,
+                    },
                   ]}
                 >
                   <Text
                     style={[
                       styles.genderText,
+                      { color: colors.text },
                       draft === option && styles.genderTextSelected,
                     ]}
                   >
@@ -73,19 +81,32 @@ export function ProfileEditorModal({
             <TextInput
               autoFocus
               onChangeText={setDraft}
-              style={styles.input}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.input,
+                  borderColor: colors.border,
+                  color: colors.text,
+                },
+              ]}
               value={draft}
             />
           )}
 
           <View style={styles.actions}>
             <TouchableOpacity onPress={onCancel} style={styles.cancel}>
-              <Text style={styles.cancelText}>Cancel</Text>
+              <Text style={[styles.cancelText, { color: colors.textMuted }]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               disabled={!draft.trim()}
               onPress={() => onSave(draft.trim())}
-              style={[styles.save, !draft.trim() && styles.disabled]}
+              style={[
+                styles.save,
+                { backgroundColor: colors.primary },
+                !draft.trim() && styles.disabled,
+              ]}
             >
               <Text style={styles.saveText}>Save</Text>
             </TouchableOpacity>

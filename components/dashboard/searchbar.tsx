@@ -3,6 +3,7 @@ import { Search, User } from "lucide-react-native";
 import React from "react";
 import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 interface SearchBarProps {
   mapRef: React.RefObject<any>;
@@ -11,6 +12,7 @@ interface SearchBarProps {
 
 export default function SearchBar({ mapRef, onSelectPlace }: SearchBarProps) {
   const router = useRouter();
+  const { colors } = useAppTheme();
 
   const GOOGLE_MAPS_API_KEY = Platform.select({
     ios: "AIzaSyCWHublkXuYaWfT68qUwGY3o5L9NB82JA8",
@@ -54,7 +56,7 @@ export default function SearchBar({ mapRef, onSelectPlace }: SearchBarProps) {
         keyboardShouldPersistTaps="handled"
         renderLeftButton={() => (
           <View style={styles.searchIcon}>
-            <Search size={22} color="#7A7A7A" />
+            <Search size={22} color={colors.textMuted} />
           </View>
         )}
         renderRightButton={() => (
@@ -68,11 +70,14 @@ export default function SearchBar({ mapRef, onSelectPlace }: SearchBarProps) {
           </View>
         )}
         styles={{
-          textInputContainer: styles.textInputContainer,
-          textInput: styles.textInput,
-          listView: styles.listView,
-          row: styles.row,
-          description: styles.description,
+          textInputContainer: [
+            styles.textInputContainer,
+            { backgroundColor: colors.input },
+          ],
+          textInput: [styles.textInput, { color: colors.text }],
+          listView: [styles.listView, { backgroundColor: colors.surfaceElevated }],
+          row: [styles.row, { backgroundColor: colors.surfaceElevated }],
+          description: [styles.description, { color: colors.text }],
         }}
       />
     </View>

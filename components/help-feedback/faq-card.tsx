@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { HELP_FEEDBACK_COLORS } from './help-feedback-theme';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 type FaqCardProps = {
   answer: string;
@@ -13,14 +14,15 @@ type FaqCardProps = {
 };
 
 export function FaqCard({ answer, expanded, icon, onPress, title }: FaqCardProps) {
+  const { colors } = useAppTheme();
   return (
-    <TouchableOpacity activeOpacity={0.78} onPress={onPress} style={styles.card}>
+    <TouchableOpacity activeOpacity={0.78} onPress={onPress} style={[styles.card, { backgroundColor: colors.surface }]}>
       <View style={styles.header}>
-        <View style={styles.iconBox}>{icon}</View>
+        <View style={[styles.iconBox, { backgroundColor: colors.primarySoft }]}>{icon}</View>
         <Text style={styles.title}>{title}</Text>
         <Feather name={expanded ? 'chevron-up' : 'chevron-down'} size={20} color="#7D8790" />
       </View>
-      {expanded ? <Text style={styles.answer}>{answer}</Text> : null}
+      {expanded ? <Text style={[styles.answer, { borderTopColor: colors.border, color: colors.textMuted }]}>{answer}</Text> : null}
     </TouchableOpacity>
   );
 }

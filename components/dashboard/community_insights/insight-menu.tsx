@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 const SCREEN_HEIGHT =
   Dimensions.get("window").height;
@@ -28,6 +29,7 @@ export default function InsightMenu({
   onClose,
   onDelete,
 }: Props) {
+  const { colors } = useAppTheme();
   const slideAnim = useRef(
     new Animated.Value(SCREEN_HEIGHT)
   ).current;
@@ -61,11 +63,12 @@ export default function InsightMenu({
       <TouchableWithoutFeedback
         onPress={handleClose}
       >
-        <View style={styles.overlay}>
+        <View style={[styles.overlay, { backgroundColor: colors.overlay }]}>
           <TouchableWithoutFeedback>
             <Animated.View
               style={[
                 styles.sheet,
+                { backgroundColor: colors.surfaceElevated },
                 {
                   transform: [
                     { translateY: slideAnim },
@@ -73,7 +76,7 @@ export default function InsightMenu({
                 },
               ]}
             >
-              <Text style={styles.title}>
+              <Text style={[styles.title, { color: colors.textMuted }]}>
                 More Options
               </Text>
 
@@ -84,9 +87,9 @@ export default function InsightMenu({
                 <Ionicons
                   name="arrow-redo-outline"
                   size={20}
-                  color="#333"
+                  color={colors.text}
                 />
-                <Text style={styles.itemText}>
+                <Text style={[styles.itemText, { color: colors.text }]}>
                   Share
                 </Text>
               </TouchableOpacity>
@@ -98,9 +101,9 @@ export default function InsightMenu({
                 <Ionicons
                   name="flag-outline"
                   size={20}
-                  color="#333"
+                  color={colors.text}
                 />
-                <Text style={styles.itemText}>
+                <Text style={[styles.itemText, { color: colors.text }]}>
                   Report
                 </Text>
               </TouchableOpacity>
@@ -112,9 +115,9 @@ export default function InsightMenu({
                 <Ionicons
                   name="download-outline"
                   size={20}
-                  color="#333"
+                  color={colors.text}
                 />
-                <Text style={styles.itemText}>
+                <Text style={[styles.itemText, { color: colors.text }]}>
                   Save
                 </Text>
               </TouchableOpacity>

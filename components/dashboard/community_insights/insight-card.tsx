@@ -12,6 +12,7 @@ import { MoreHorizontal, ThumbsDown, ThumbsUp } from "lucide-react-native";
 
 import InsightMenu from "./insight-menu";
 import { Insight } from "./types";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 interface Props {
   insight: Insight;
@@ -39,6 +40,7 @@ export default function InsightCard({
   onReact,
   onDelete,
 }: Props) {
+  const { colors } = useAppTheme();
   const { username, avatar_url } = insight.profiles;
   const liked = insight.userReaction === "like";
   const disliked = insight.userReaction === "dislike";
@@ -58,7 +60,7 @@ export default function InsightCard({
   };
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.surface }]}>
       {avatar_url ? (
         <Image source={{ uri: avatar_url }} style={styles.avatar} />
       ) : (
@@ -80,13 +82,13 @@ export default function InsightCard({
           </View>
 
           <TouchableOpacity onPress={() => setMenuOpen(true)}>
-            <MoreHorizontal size={18} color="#000" />
+            <MoreHorizontal size={18} color={colors.text} />
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.message}>{insight.content}</Text>
+        <Text style={[styles.message, { color: colors.text }]}>{insight.content}</Text>
 
-        <Text style={styles.meta}>
+        <Text style={[styles.meta, { color: colors.textMuted }]}>
           Route: {insight.route} • {timeAgo(insight.created_at)}
         </Text>
 
@@ -95,8 +97,8 @@ export default function InsightCard({
             style={styles.actionItem}
             onPress={() => onReact("like")}
           >
-            <ThumbsUp size={18} color={liked ? "#74AFA0" : "#000"} />
-            <Text style={liked ? styles.activeCount : undefined}>
+            <ThumbsUp size={18} color={liked ? colors.accent : colors.text} />
+            <Text style={[{ color: colors.text }, liked && styles.activeCount]}>
               {insight.likes}
             </Text>
           </TouchableOpacity>
@@ -105,8 +107,8 @@ export default function InsightCard({
             style={styles.actionItem}
             onPress={() => onReact("dislike")}
           >
-            <ThumbsDown size={18} color={disliked ? "#E57373" : "#000"} />
-            <Text style={disliked ? styles.activeDislike : undefined}>
+            <ThumbsDown size={18} color={disliked ? colors.danger : colors.text} />
+            <Text style={[{ color: colors.text }, disliked && styles.activeDislike]}>
               {insight.dislikes}
             </Text>
           </TouchableOpacity>

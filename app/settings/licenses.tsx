@@ -6,6 +6,7 @@ import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'r
 import { LicenseCard } from '@/components/licenses/license-card';
 import { LICENSE_COLORS } from '@/components/licenses/license-theme';
 import { SettingsSubpageHeader } from '@/components/settings/settings-subpage-header';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 const SUPPORT_EMAIL = 'zapac.developers@gmail.com';
 
@@ -24,36 +25,37 @@ const LICENSES = [
 ];
 
 export default function LicensesScreen() {
+  const { colors } = useAppTheme();
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <StatusBar style="light" />
       <SettingsSubpageHeader onBack={() => router.back()} title="Open-Source Licenses" />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <View style={styles.introCard}>
+        <View style={[styles.introCard, { backgroundColor: colors.primarySoft }]}>
           <View style={styles.iconBadge}>
             <Feather name="heart" size={21} color="#FFFFFF" />
           </View>
           <Text style={styles.eyebrow}>BUILT WITH GREAT TOOLS</Text>
-          <Text style={styles.title}>Thank you, open source!</Text>
-          <Text style={styles.intro}>
+          <Text style={[styles.title, { color: colors.text }]}>Thank you, open source!</Text>
+          <Text style={[styles.intro, { color: colors.textMuted }]}>
             ZAPAC is built with software generously shared by developer communities around the
             world. Tap a package to visit its repository.
           </Text>
         </View>
 
-        <Text style={styles.sectionTitle}>MAJOR PACKAGES</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>MAJOR PACKAGES</Text>
         {LICENSES.map(item => <LicenseCard key={item.name} {...item} />)}
 
-        <View style={styles.notice}>
-          <Text style={styles.noticeText}>
+        <View style={[styles.notice, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.noticeText, { color: colors.textMuted }]}>
             Open-source components remain subject to their respective license terms. This list
             highlights major packages and is not a substitute for a complete release audit.
           </Text>
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}`)}
-            style={styles.emailButton}
+            style={[styles.emailButton, { backgroundColor: colors.primarySoft }]}
           >
             <Feather name="mail" size={15} color={LICENSE_COLORS.blue} />
             <Text style={styles.email}>{SUPPORT_EMAIL}</Text>

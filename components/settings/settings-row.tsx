@@ -3,9 +3,9 @@ import { ReactNode } from 'react';
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 
 import { SETTINGS_COLORS } from './settings-theme';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 type SettingsRowProps = {
-  darkMode?: boolean;
   destructive?: boolean;
   icon: ReactNode;
   label: string;
@@ -16,7 +16,6 @@ type SettingsRowProps = {
 };
 
 export function SettingsRow({
-  darkMode = false,
   destructive = false,
   icon,
   label,
@@ -25,6 +24,7 @@ export function SettingsRow({
   showChevron = true,
   value,
 }: SettingsRowProps) {
+  const { colors } = useAppTheme();
   const isToggle = typeof value === 'boolean' && onToggle;
 
   return (
@@ -32,11 +32,20 @@ export function SettingsRow({
       activeOpacity={onPress ? 0.75 : 1}
       disabled={!onPress}
       onPress={onPress}
-      style={[styles.row, darkMode && styles.darkRow]}
+      style={[styles.row, { backgroundColor: colors.surface }]}
     >
       <View style={styles.rowStart}>
-        <View style={[styles.iconBox, destructive && styles.destructiveIconBox]}>{icon}</View>
-        <Text style={[styles.label, darkMode && styles.darkLabel, destructive && styles.destructiveLabel]}>
+        <View
+          style={[
+            styles.iconBox,
+            { backgroundColor: colors.primarySoft },
+            destructive && styles.destructiveIconBox,
+            destructive && { backgroundColor: colors.dangerSoft },
+          ]}
+        >
+          {icon}
+        </View>
+        <Text style={[styles.label, { color: colors.text }, destructive && styles.destructiveLabel]}>
           {label}
         </Text>
       </View>
@@ -80,9 +89,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  darkRow: {
-    backgroundColor: SETTINGS_COLORS.darkCard,
-  },
   iconBox: {
     width: 30,
     height: 30,
@@ -98,9 +104,6 @@ const styles = StyleSheet.create({
     color: SETTINGS_COLORS.text,
     fontSize: 14,
     fontWeight: '600',
-  },
-  darkLabel: {
-    color: SETTINGS_COLORS.darkText,
   },
   destructiveLabel: {
     color: SETTINGS_COLORS.red,

@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { ABOUT_COLORS } from './about-theme';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 const FEATURES = [
   { icon: 'map-pin' as const, label: 'Local routes' },
@@ -11,15 +12,19 @@ const FEATURES = [
 ];
 
 export function AboutHero() {
+  const { colors, isDark } = useAppTheme();
   return (
-    <LinearGradient colors={['#EEF5FD', '#FFFFFF']} style={styles.card}>
+    <LinearGradient
+      colors={isDark ? [colors.primarySoft, colors.surface] : ['#EEF5FD', '#FFFFFF']}
+      style={[styles.card, { borderColor: colors.border }]}
+    >
       <View style={styles.decorativeCircle} />
       <View style={styles.iconBadge}>
         <MaterialCommunityIcons name="navigation-variant" size={37} color="#FFFFFF" />
       </View>
       <Text style={styles.eyebrow}>HELLO, COMMUTER</Text>
-      <Text style={styles.title}>Your Guide to Cebuano Transit</Text>
-      <Text style={styles.description}>
+      <Text style={[styles.title, { color: colors.text }]}>Your Guide to Cebuano Transit</Text>
+      <Text style={[styles.description, { color: colors.textMuted }]}>
         ZAPAC makes navigating Cebu&apos;s public and private transportation simple, safe, and
         community-driven. Find real-time routes, clearer fare estimates, and local insights that
         help you move smarter across the city.
@@ -27,7 +32,7 @@ export function AboutHero() {
 
       <View style={styles.features}>
         {FEATURES.map(feature => (
-          <View key={feature.label} style={styles.feature}>
+          <View key={feature.label} style={[styles.feature, { backgroundColor: colors.primarySoft }]}>
             <Feather name={feature.icon} size={14} color={ABOUT_COLORS.blue} />
             <Text style={styles.featureText}>{feature.label}</Text>
           </View>

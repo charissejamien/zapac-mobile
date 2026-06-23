@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { SETTINGS_COLORS } from "@/components/settings/settings-theme";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 type ProfileDetailRowProps = {
   icon: ReactNode;
@@ -17,12 +18,20 @@ export function ProfileDetailRow({
   onPress,
   value,
 }: ProfileDetailRowProps) {
+  const { colors } = useAppTheme();
+
   return (
-    <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={styles.row}>
-      <View style={styles.iconBox}>{icon}</View>
+    <TouchableOpacity
+      activeOpacity={0.7}
+      onPress={onPress}
+      style={[styles.row, { backgroundColor: colors.surface }]}
+    >
+      <View style={[styles.iconBox, { backgroundColor: colors.primarySoft }]}>
+        {icon}
+      </View>
       <View style={styles.text}>
-        <Text style={styles.label}>{label}</Text>
-        <Text style={styles.value}>{value}</Text>
+        <Text style={[styles.label, { color: colors.textMuted }]}>{label}</Text>
+        <Text style={[styles.value, { color: colors.text }]}>{value}</Text>
       </View>
       <Feather name="chevron-right" size={19} color="#989898" />
     </TouchableOpacity>

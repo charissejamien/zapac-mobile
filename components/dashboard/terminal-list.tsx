@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 interface RouteFare {
   route: string;
@@ -249,6 +250,7 @@ interface TerminalListProps {
 }
 
 export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
+  const { colors } = useAppTheme();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
@@ -259,7 +261,7 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
       renderItem={({ item }) => {
         const isExpanded = expandedId === item.id;
         return (
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={() => setExpandedId(isExpanded ? null : item.id)}
@@ -267,7 +269,9 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
             >
               <View style={styles.titleRow}>
                 <Bus size={20} color="#74AFA0" style={styles.iconGap} />
-                <Text style={styles.terminalName}>{item.name}</Text>
+                <Text style={[styles.terminalName, { color: colors.text }]}>
+                  {item.name}
+                </Text>
               </View>
               <TouchableOpacity
                 style={styles.mapPinButton}
@@ -278,26 +282,26 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
             </TouchableOpacity>
 
             {isExpanded && (
-              <View style={styles.expandedContent}>
+              <View style={[styles.expandedContent, { borderTopColor: colors.border }]}>
                 <View style={styles.metaItem}>
-                  <Clock size={14} color="#666" style={styles.iconGap} />
-                  <Text style={styles.metaText}>{item.details.status}</Text>
+                  <Clock size={14} color={colors.textMuted} style={styles.iconGap} />
+                  <Text style={[styles.metaText, { color: colors.textMuted }]}>{item.details.status}</Text>
                 </View>
                 <View style={styles.metaItem}>
-                  <Info size={14} color="#666" style={styles.iconGap} />
-                  <Text style={styles.metaText}>{item.details.facilities}</Text>
+                  <Info size={14} color={colors.textMuted} style={styles.iconGap} />
+                  <Text style={[styles.metaText, { color: colors.textMuted }]}>{item.details.facilities}</Text>
                 </View>
 
                 <Text style={styles.sectionTitle}>Routes & Fares</Text>
                 {item.details.routes_fares.map((rf, idx) => (
-                  <View key={idx} style={styles.fareRow}>
+                  <View key={idx} style={[styles.fareRow, { borderBottomColor: colors.border }]}>
                     <View style={styles.fareRouteContainer}>
                       {rf.vehicle_code && (
                         <Text style={styles.vehicleBadge}>
                           {rf.vehicle_code}
                         </Text>
                       )}
-                      <Text style={styles.fareRouteText}>{rf.route}</Text>
+                      <Text style={[styles.fareRouteText, { color: colors.text }]}>{rf.route}</Text>
                     </View>
                     <Text style={styles.fareAmount}>{rf.fare}</Text>
                   </View>
