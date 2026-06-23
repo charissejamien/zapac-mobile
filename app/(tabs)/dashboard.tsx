@@ -237,38 +237,15 @@ export default function Dashboard() {
         {/* Terminal Marker Selection */}
         {selectedTerminal && (
           <Marker
-            key={`terminal-${selectedTerminal.latitude}-${selectedTerminal.longitude}`}
+            key={`native-terminal-pin-${selectedTerminal.latitude}-${selectedTerminal.longitude}`}
             coordinate={{
               latitude: selectedTerminal.latitude,
               longitude: selectedTerminal.longitude,
             }}
             title={selectedTerminal.title}
-            anchor={{ x: 0.5, y: 1 }}
-          >
-            <View style={styles.markerWrapper}>
-              <View style={styles.markerLabel}>
-                <View style={styles.markerLabelIcon}>
-                  <BusFront size={15} color="#FFFFFF" />
-                </View>
-                <View style={styles.markerLabelCopy}>
-                  <Text style={styles.markerEyebrow}>TERMINAL</Text>
-                  <Text style={styles.markerLabelText} numberOfLines={2}>
-                    {selectedTerminal.title}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.markerNeedle}>
-                <View style={styles.markerNeedleHead}>
-                  <BusFront size={17} color="#FFFFFF" strokeWidth={2.4} />
-                </View>
-                <View style={styles.markerNeedleStem} />
-                <View style={styles.markerNeedlePoint} />
-              </View>
-
-              <View style={styles.markerGroundDot} />
-            </View>
-          </Marker>
+            description="Bus terminal"
+            pinColor="#74AFA0"
+          />
         )}
       </MapView>
 
@@ -462,101 +439,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#74AFA0",
     marginRight: 9,
-  },
-  markerWrapper: {
-    alignItems: "center",
-    width: 220,
-    paddingBottom: 3,
-  },
-  markerLabel: {
-    width: 206,
-    minHeight: 54,
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 16,
-    backgroundColor: "#26354A",
-    paddingHorizontal: 10,
-    paddingVertical: 9,
-    marginBottom: 7,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.16)",
-    shadowColor: "#26354A",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.28,
-    shadowRadius: 7,
-    elevation: 7,
-  },
-  markerLabelIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: 11,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#74AFA0",
-    marginRight: 9,
-  },
-  markerLabelCopy: {
-    flex: 1,
-  },
-  markerEyebrow: {
-    color: "#A9D2C8",
-    fontSize: 8,
-    lineHeight: 10,
-    fontWeight: "900",
-    letterSpacing: 1.1,
-  },
-  markerLabelText: {
-    color: "#FFFFFF",
-    fontSize: 11,
-    lineHeight: 14,
-    fontWeight: "800",
-    marginTop: 1,
-  },
-  markerNeedle: {
-    width: 56,
-    height: 76,
-    alignItems: "center",
-  },
-  markerNeedleHead: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#74AFA0",
-    borderWidth: 4,
-    borderColor: "#FFFFFF",
-    shadowColor: "#26354A",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 7,
-    zIndex: 2,
-  },
-  markerNeedleStem: {
-    width: 7,
-    height: 21,
-    backgroundColor: "#5A9B8B",
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderColor: "rgba(255,255,255,0.7)",
-    marginTop: -2,
-  },
-  markerNeedlePoint: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 5,
-    borderRightWidth: 5,
-    borderTopWidth: 9,
-    borderLeftColor: "transparent",
-    borderRightColor: "transparent",
-    borderTopColor: "#5A9B8B",
-  },
-  markerGroundDot: {
-    width: 14,
-    height: 4,
-    borderRadius: 8,
-    backgroundColor: "rgba(38,53,74,0.24)",
-    marginTop: -2,
   },
 });

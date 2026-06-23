@@ -166,12 +166,6 @@ export default function SettingsScreen() {
         avatarUrl={avatarUrl}
         onAvatarPress={pickAvatar}
         onEditUsername={openEditUsername}
-        onEditProfile={() =>
-          router.push({
-            pathname: "/profile",
-            params: { email, name: username },
-          })
-        }
       />
 
       <Modal

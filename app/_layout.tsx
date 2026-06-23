@@ -49,18 +49,6 @@ function RootNavigator() {
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
-        name="profile"
-        options={{
-          animation: "ios_from_right",
-          animationDuration: 420,
-          animationMatchesGesture: true,
-          fullScreenGestureEnabled: true,
-          gestureEnabled: true,
-          gestureDirection: "horizontal",
-          presentation: "card",
-        }}
-      />
-      <Stack.Screen
         name="settings"
         options={{
           animation: "default",
