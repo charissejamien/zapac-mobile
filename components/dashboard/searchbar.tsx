@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { Search, User } from "lucide-react-native";
-import React from "react";
+import React, { useState } from "react";
 import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { useAppTheme } from "@/src/theme/app-theme";
@@ -13,6 +13,7 @@ interface SearchBarProps {
 export default function SearchBar({ mapRef, onSelectPlace }: SearchBarProps) {
   const router = useRouter();
   const { colors } = useAppTheme();
+  const [isFocused, setIsFocused] = useState(false);
 
   const GOOGLE_MAPS_API_KEY = Platform.select({
     ios: "AIzaSyCWHublkXuYaWfT68qUwGY3o5L9NB82JA8",
@@ -54,30 +55,57 @@ export default function SearchBar({ mapRef, onSelectPlace }: SearchBarProps) {
         nearbyPlacesAPI="GooglePlacesSearch"
         enablePoweredByContainer={false}
         keyboardShouldPersistTaps="handled"
+        textInputProps={{
+          onFocus: () => setIsFocused(true),
+          onBlur: () => setIsFocused(false),
+          placeholderTextColor: colors.textMuted,
+          selectionColor: colors.accent,
+        }}
         renderLeftButton={() => (
           <View style={styles.searchIcon}>
-            <Search size={22} color={colors.textMuted} />
+            <Search
+              size={20}
+              strokeWidth={2.25}
+              color={isFocused ? colors.accent : colors.textMuted}
+            />
           </View>
         )}
         renderRightButton={() => (
           <View style={styles.profileIconWrapper}>
+            <View
+              style={[styles.divider, { backgroundColor: colors.border }]}
+            />
             <TouchableOpacity
-              style={styles.iconContainer}
+              activeOpacity={0.8}
+              style={[
+                styles.iconContainer,
+                { backgroundColor: colors.accent },
+              ]}
               onPress={() => router.push("/settings")}
             >
-              <User size={18} color="#FFF" />
+              <User size={19} strokeWidth={2.25} color="#FFF" />
             </TouchableOpacity>
           </View>
         )}
         styles={{
           textInputContainer: [
             styles.textInputContainer,
-            { backgroundColor: colors.input },
+            {
+              backgroundColor: colors.input,
+              borderColor: isFocused ? colors.accent : colors.border,
+            },
           ],
           textInput: [styles.textInput, { color: colors.text }],
-          listView: [styles.listView, { backgroundColor: colors.surfaceElevated }],
+          listView: [
+            styles.listView,
+            {
+              backgroundColor: colors.surfaceElevated,
+              borderColor: colors.border,
+            },
+          ],
           row: [styles.row, { backgroundColor: colors.surfaceElevated }],
           description: [styles.description, { color: colors.text }],
+          separator: [styles.separator, { backgroundColor: colors.border }],
         }}
       />
     </View>
@@ -91,66 +119,98 @@ const styles = StyleSheet.create({
     zIndex: 99999,
   },
   textInputContainer: {
-    backgroundColor: "#F9F9F9",
-    height: 56,
-    borderRadius: 16,
+    height: 58,
+    borderRadius: 20,
+    borderWidth: 1,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 14,
+    paddingHorizontal: 6,
     shadowColor: "#000",
-    shadowOpacity: 0.12,
-    shadowRadius: 5,
-    elevation: 4,
+    shadowOpacity: 0.14,
+    shadowRadius: 12,
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    elevation: 6,
   },
   textInput: {
     backgroundColor: "transparent",
-    fontSize: 16,
-    color: "#000",
-    height: "100%",
-    paddingLeft: 10,
-    paddingRight: 10,
+    fontSize: 15,
+    fontWeight: "500",
+    lineHeight: 20,
+    height: 48,
+    paddingLeft: 4,
+    paddingRight: 8,
+    paddingVertical: 0,
+    textAlignVertical: "center",
     flex: 1,
   },
   searchIcon: {
     justifyContent: "center",
     alignItems: "center",
-    height: 56,
+    width: 42,
+    height: 58,
   },
   profileIconWrapper: {
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    height: 56,
+    height: 58,
+    paddingRight: 4,
+    gap: 10,
+  },
+  divider: {
+    width: StyleSheet.hairlineWidth,
+    height: 26,
   },
   iconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#74AFA0",
+    width: 38,
+    height: 38,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#315D52",
+    shadowOpacity: 0.24,
+    shadowRadius: 5,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    elevation: 3,
   },
   listView: {
-    backgroundColor: "#FFF",
-    borderRadius: 12,
-    marginTop: 5,
-    elevation: 5,
+    borderRadius: 18,
+    borderWidth: 1,
+    marginTop: 8,
+    elevation: 8,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowOpacity: 0.14,
+    shadowRadius: 12,
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
     position: "absolute",
-    top: 60,
+    top: 62,
     left: 0,
     right: 0,
     zIndex: 99999,
+    overflow: "hidden",
   },
   row: {
-    padding: 13,
-    height: 44,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    minHeight: 52,
     flexDirection: "row",
-    backgroundColor: "#FFF",
+    alignItems: "center",
   },
   description: {
     fontSize: 14,
-    color: "#333",
+    fontWeight: "500",
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    marginLeft: 16,
   },
 });
