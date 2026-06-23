@@ -2,29 +2,31 @@ import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { ABOUT_COLORS } from './about-theme';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 export function AboutInfoCard() {
+  const { colors } = useAppTheme();
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.surface }]}>
       <View style={styles.item}>
         <View style={[styles.iconBox, styles.versionIcon]}>
           <Feather name="code" size={18} color={ABOUT_COLORS.green} />
         </View>
         <View>
-          <Text style={styles.label}>Version</Text>
-          <Text style={styles.value}>1.0.0 (Build 42)</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Version</Text>
+          <Text style={[styles.value, { color: colors.textMuted }]}>1.0.0 (Build 42)</Text>
         </View>
       </View>
 
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
       <View style={styles.item}>
         <View style={[styles.iconBox, styles.regionIcon]}>
           <MaterialCommunityIcons name="city-variant-outline" size={20} color={ABOUT_COLORS.blue} />
         </View>
         <View>
-          <Text style={styles.label}>Home Base</Text>
-          <Text style={styles.value}>Cebu, Philippines</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Home Base</Text>
+          <Text style={[styles.value, { color: colors.textMuted }]}>Cebu, Philippines</Text>
         </View>
       </View>
     </View>

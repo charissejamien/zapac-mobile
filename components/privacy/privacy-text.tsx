@@ -2,14 +2,16 @@ import { PropsWithChildren } from 'react';
 import { StyleSheet, Text } from 'react-native';
 
 import { PRIVACY_COLORS } from './privacy-theme';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 type PrivacyTextProps = PropsWithChildren<{
   bullet?: boolean;
 }>;
 
 export function PrivacyText({ bullet = false, children }: PrivacyTextProps) {
+  const { colors } = useAppTheme();
   return (
-    <Text style={styles.text}>
+    <Text style={[styles.text, { color: colors.text }]}>
       {bullet ? '\u2022 ' : ''}
       {children}
     </Text>

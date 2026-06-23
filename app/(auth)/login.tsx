@@ -17,8 +17,10 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 export default function AuthScreen() {
+  const { colors, isDark } = useAppTheme();
   const [tab, setTab] = useState<'login' | 'signup'>('login');
 
   const [email, setEmail] = useState('');
@@ -114,7 +116,7 @@ export default function AuthScreen() {
 
           {/* White card behind header and footer */}
           <KeyboardAvoidingView
-            style={styles.card}
+            style={[styles.card, { backgroundColor: colors.background }]}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           >
             <ScrollView
@@ -131,13 +133,13 @@ export default function AuthScreen() {
                   {tab === 'login' ? 'Welcome Back!' : 'Create an Account'}
                 </Text>
 
-                <Text style={styles.label}>Email</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Email</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
                   value={email}
                   onChangeText={setEmail}
                   placeholder="Enter email"
-                  placeholderTextColor="#AAA"
+                  placeholderTextColor={colors.textMuted}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -145,27 +147,27 @@ export default function AuthScreen() {
 
                 {tab === 'signup' && (
                   <>
-                    <Text style={styles.label}>Username</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>Username</Text>
                     <TextInput
-                      style={styles.input}
+                      style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
                       value={username}
                       onChangeText={setUsername}
                       placeholder="Enter username"
-                      placeholderTextColor="#AAA"
+                      placeholderTextColor={colors.textMuted}
                       autoCapitalize="none"
                       autoCorrect={false}
                     />
                   </>
                 )}
 
-                <Text style={styles.label}>Password</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Password</Text>
                 <View>
                   <TextInput
-                    style={[styles.input, { paddingRight: 48 }]}
+                    style={[styles.input, { paddingRight: 48, backgroundColor: colors.input, color: colors.text }]}
                     value={password}
                     onChangeText={setPassword}
                     placeholder="Enter Password"
-                    placeholderTextColor="#AAA"
+                    placeholderTextColor={colors.textMuted}
                     secureTextEntry={!showPassword}
                   />
                   <TouchableOpacity
@@ -179,14 +181,14 @@ export default function AuthScreen() {
 
                 {tab === 'signup' && (
                   <>
-                    <Text style={styles.label}>Confirm Password</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>Confirm Password</Text>
                     <View>
                       <TextInput
-                        style={[styles.input, { paddingRight: 48 }]}
+                        style={[styles.input, { paddingRight: 48, backgroundColor: colors.input, color: colors.text }]}
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
                         placeholder="Enter Password"
-                        placeholderTextColor="#AAA"
+                        placeholderTextColor={colors.textMuted}
                         secureTextEntry={!showPassword}
                       />
                       <TouchableOpacity
@@ -222,7 +224,7 @@ export default function AuthScreen() {
 
                 {tab === 'login' && (
                   <View style={styles.forgotRow}>
-                    <Text style={styles.forgotText}>Forgotten your password? </Text>
+                    <Text style={[styles.forgotText, { color: colors.textMuted }]}>Forgotten your password? </Text>
                     <TouchableOpacity onPress={() => router.push('/(auth)/reset-password')} activeOpacity={0.7}>
                       <Text style={styles.resetText}>Reset password</Text>
                     </TouchableOpacity>
@@ -230,11 +232,11 @@ export default function AuthScreen() {
                 )}
 
                 <View style={styles.dividerRow}>
-                  <View style={styles.dividerLine} />
-                  <Text style={styles.dividerText}>
+                  <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+                  <Text style={[styles.dividerText, { color: colors.textMuted }]}>
                     {tab === 'login' ? 'or sign in with' : 'or sign up with'}
                   </Text>
-                  <View style={styles.dividerLine} />
+                  <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
                 </View>
 
                 <View style={styles.oauthRow}>
@@ -247,12 +249,18 @@ export default function AuthScreen() {
                     <Text style={styles.googleBtnText}>Google</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={styles.facebookBtn}
+                    style={[
+                      styles.facebookBtn,
+                      {
+                        backgroundColor: colors.surface,
+                        borderColor: colors.border,
+                      },
+                    ]}
                     onPress={() => handleOAuth('facebook')}
                     activeOpacity={0.85}
                   >
                     <FontAwesome name="facebook" size={17} color="#1877F2" />
-                    <Text style={styles.facebookBtnText}>Facebook</Text>
+                    <Text style={[styles.facebookBtnText, { color: colors.text }]}>Facebook</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -261,7 +269,16 @@ export default function AuthScreen() {
 
           {/* Blue header — absolute, on top */}
           <View
-            style={[styles.blueHeader, { position: 'absolute', top: 0, left: 0, right: 0 }]}
+            style={[
+              styles.blueHeader,
+              {
+                backgroundColor: isDark ? '#18283B' : '#4A6FA5',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+              },
+            ]}
             onLayout={(e: LayoutChangeEvent) => setHeaderHeight(e.nativeEvent.layout.height)}
           >
             <View style={styles.logoContainer}>
@@ -298,7 +315,15 @@ export default function AuthScreen() {
           </View>
 
           {/* Blue footer — absolute, rounded top */}
-          <View style={[styles.blueFooter, { height: footerHeight }]} />
+          <View
+            style={[
+              styles.blueFooter,
+              {
+                backgroundColor: isDark ? '#18283B' : '#4A6FA5',
+                height: footerHeight,
+              },
+            ]}
+          />
 
         </View>
       </SafeAreaView>

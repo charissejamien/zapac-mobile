@@ -19,6 +19,7 @@ import {
 } from "react-native";
 
 import { supabase } from "@/src/lib/supabase";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 const SCREEN_HEIGHT =
   Dimensions.get("window").height;
@@ -106,6 +107,7 @@ export default function NewInsightModal({
   visible,
   onClose,
 }: Props) {
+  const { colors } = useAppTheme();
   const [content, setContent] = useState("");
   const [route, setRoute] = useState("");
   const [username, setUsername] = useState("");
@@ -194,7 +196,7 @@ export default function NewInsightModal({
       <TouchableWithoutFeedback
         onPress={handleClose}
       >
-        <View style={styles.overlay}>
+        <View style={[styles.overlay, { backgroundColor: colors.overlay }]}>
           <KeyboardAvoidingView
             behavior={
               Platform.OS === "ios"
@@ -207,6 +209,7 @@ export default function NewInsightModal({
               <Animated.View
                 style={[
                   styles.card,
+                  { backgroundColor: colors.surfaceElevated },
                   {
                     transform: [
                       {
@@ -244,12 +247,12 @@ export default function NewInsightModal({
                   )}
 
                   <View>
-                    <Text style={styles.name}>
+                    <Text style={[styles.name, { color: colors.text }]}>
                       {username}
                     </Text>
 
                     <Text
-                      style={styles.subtitle}
+                      style={[styles.subtitle, { color: colors.textMuted }]}
                     >
                       Posting publicly across
                       ZAPAC
@@ -258,21 +261,21 @@ export default function NewInsightModal({
                 </View>
 
                 <TextInput
-                  style={styles.contentInput}
+                  style={[styles.contentInput, { color: colors.text }]}
                   placeholder="Share an insight to the community...."
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.textMuted}
                   multiline
                   value={content}
                   onChangeText={setContent}
                 />
 
                 <View
-                  style={styles.routeWrapper}
+                  style={[styles.routeWrapper, { borderColor: colors.border, backgroundColor: colors.input }]}
                 >
                   <TextInput
-                    style={styles.routeInput}
+                    style={[styles.routeInput, { color: colors.text }]}
                     placeholder="What route are you on?"
-                    placeholderTextColor="#999"
+                    placeholderTextColor={colors.textMuted}
                     value={route}
                     onChangeText={setRoute}
                   />

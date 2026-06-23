@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { PRIVACY_COLORS } from './privacy-theme';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 type PrivacyPolicySectionProps = {
   children: ReactNode;
@@ -9,9 +10,10 @@ type PrivacyPolicySectionProps = {
 };
 
 export function PrivacyPolicySection({ children, title }: PrivacyPolicySectionProps) {
+  const { colors } = useAppTheme();
   return (
-    <View style={styles.section}>
-      <Text style={styles.title}>{title}</Text>
+    <View style={[styles.section, { backgroundColor: colors.surface }]}>
+      <Text style={[styles.title, { color: colors.primary }]}>{title}</Text>
       <View style={styles.content}>{children}</View>
     </View>
   );

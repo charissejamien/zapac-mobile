@@ -2,6 +2,7 @@ import { Feather } from '@expo/vector-icons';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 import { HELP_FEEDBACK_COLORS } from './help-feedback-theme';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 const RATING_FEEDBACK = [
   '',
@@ -29,13 +30,14 @@ export function FeedbackForm({
   onSubmit,
   rating,
 }: FeedbackFormProps) {
+  const { colors } = useAppTheme();
   const canSubmit = Boolean(message.trim() && rating);
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.surface }]}>
       <Text style={styles.eyebrow}>SHARE YOUR THOUGHTS</Text>
-      <Text style={styles.title}>How can we make your commute better?</Text>
-      <Text style={styles.description}>Your ideas help shape the next version of ZAPAC.</Text>
+      <Text style={[styles.title, { color: colors.text }]}>How can we make your commute better?</Text>
+      <Text style={[styles.description, { color: colors.textMuted }]}>Your ideas help shape the next version of ZAPAC.</Text>
 
       <View style={styles.stars}>
         {STAR_COLORS.map((color, index) => {
@@ -49,6 +51,7 @@ export function FeedbackForm({
               onPress={() => onChangeRating(star)}
               style={[
                 styles.starButton,
+                { backgroundColor: colors.input, borderColor: colors.border },
                 selected && styles.selectedStarButton,
                 selected && { backgroundColor: `${color}1F`, borderColor: `${color}66` },
               ]}
@@ -73,8 +76,8 @@ export function FeedbackForm({
         multiline
         onChangeText={onChangeMessage}
         placeholder="Tell us what would make your trips easier..."
-        placeholderTextColor="#A5ACB4"
-        style={styles.input}
+        placeholderTextColor={colors.textMuted}
+        style={[styles.input, { backgroundColor: colors.input, borderColor: colors.border, color: colors.text }]}
         textAlignVertical="top"
         value={message}
       />

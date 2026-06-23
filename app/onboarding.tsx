@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { OnboardingDots } from '@/components/onboarding/onboarding-dots';
 import { OnboardingSlide } from '@/components/onboarding/onboarding-slide';
 import { ONBOARDING_SLIDES, type OnboardingSlide as SlideType } from '@/components/onboarding/onboarding-data';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 const { width } = Dimensions.get('window');
 
@@ -23,6 +24,7 @@ async function finish() {
 }
 
 export default function OnboardingScreen() {
+  const { colors } = useAppTheme();
   const [activeIndex, setActiveIndex] = useState(0);
   const listRef = useRef<FlatList<SlideType>>(null);
 
@@ -46,14 +48,14 @@ export default function OnboardingScreen() {
   const isLastSlide = activeIndex === ONBOARDING_SLIDES.length - 1;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
       {!isLastSlide && (
         <TouchableOpacity
           style={styles.skipBtn}
           onPress={finish}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Text style={styles.skipText}>Skip</Text>
+          <Text style={[styles.skipText, { color: colors.textMuted }]}>Skip</Text>
         </TouchableOpacity>
       )}
 
@@ -84,7 +86,7 @@ export default function OnboardingScreen() {
           <View style={styles.navRow}>
             <View style={{ width: 60 }} />
             <TouchableOpacity onPress={goNext} activeOpacity={0.75}>
-              <Text style={styles.nextText}>Next</Text>
+              <Text style={[styles.nextText, { color: colors.primary }]}>Next</Text>
             </TouchableOpacity>
           </View>
         )}

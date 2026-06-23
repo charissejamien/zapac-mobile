@@ -6,12 +6,14 @@ import {
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 export default function FavoriteScreen() {
   const router = useRouter();
+  const { colors } = useAppTheme();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style="light" backgroundColor={FAVORITES_HEADER_COLOR} />
 
       <FavoritesHeader

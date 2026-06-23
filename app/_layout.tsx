@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '../src/lib/supabase';
+import { AppThemeProvider, useAppTheme } from '../src/theme/app-theme';
 
-export default function RootLayout() {
+function RootNavigator() {
   const [session, setSession] = useState<Session | null>(null);
   const [initialized, setInitialized] = useState(false);
   const segments = useSegments();
@@ -35,5 +36,45 @@ export default function RootLayout() {
     }
   }, [session, initialized, segments]);
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  const { colors, isDark } = useAppTheme();
+
+  return (
+    <Stack
+      screenOptions={{
+        contentStyle: { backgroundColor: colors.background },
+        headerShown: false,
+        statusBarStyle: isDark ? "light" : "dark",
+      }}
+    >
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen
+        name="profile"
+        options={{
+          animation: "ios_from_right",
+          animationDuration: 420,
+          animationMatchesGesture: true,
+          fullScreenGestureEnabled: true,
+          gestureEnabled: true,
+          gestureDirection: "horizontal",
+          presentation: "card",
+        }}
+      />
+      <Stack.Screen
+        name="settings"
+        options={{
+          animation: "default",
+          gestureEnabled: true,
+        }}
+      />
+    </Stack>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <AppThemeProvider>
+      <RootNavigator />
+    </AppThemeProvider>
+  );
 }

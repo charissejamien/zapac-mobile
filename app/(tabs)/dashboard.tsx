@@ -20,6 +20,7 @@ import LocatorButton from "@/components/dashboard/locator-button";
 import SearchBar from "@/components/dashboard/searchbar";
 import TerminalButton from "@/components/dashboard/terminal-button";
 import TerminalList from "@/components/dashboard/terminal-list";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.9;
@@ -29,8 +30,39 @@ const MINIMIZED_Y = SHEET_HEIGHT - HEADER_HEIGHT;
 const COLLAPSED_Y = SHEET_HEIGHT - PREVIEW_HEIGHT;
 const EXPANDED_Y = 120;
 const SWIPE_THRESHOLD = 60;
+const DARK_MAP_STYLE = [
+  { elementType: "geometry", stylers: [{ color: "#17212D" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#AAB8C9" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#17212D" }] },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [{ color: "#2D3B49" }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#1B2634" }],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#0D1822" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "geometry",
+    stylers: [{ color: "#1B2634" }],
+  },
+  {
+    featureType: "transit",
+    elementType: "geometry",
+    stylers: [{ color: "#253246" }],
+  },
+];
 
 export default function Dashboard() {
+  const { colors, isDark } = useAppTheme();
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"insights" | "terminals">(
     "insights",
@@ -191,6 +223,7 @@ export default function Dashboard() {
       <MapView
         ref={mapRef}
         provider={PROVIDER_GOOGLE}
+        customMapStyle={isDark ? DARK_MAP_STYLE : []}
         style={StyleSheet.absoluteFillObject}
         showsUserLocation={true}
         showsMyLocationButton={false}
@@ -241,12 +274,19 @@ export default function Dashboard() {
       <Animated.View
         style={[
           styles.sheet,
+          { backgroundColor: colors.mapSheet },
           {
             transform: [{ translateY }],
           },
         ]}
       >
-        <View {...panResponder.panHandlers} style={styles.dragHeader}>
+        <View
+          {...panResponder.panHandlers}
+          style={[
+            styles.dragHeader,
+            isDark && styles.darkDragHeader,
+          ]}
+        >
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={handleHeaderPress}
@@ -256,12 +296,33 @@ export default function Dashboard() {
 
             <View style={styles.composer}>
               {activeTab === "terminals" ? (
-                <Text style={styles.terminalsTitle}>Terminals in Cebu</Text>
+                <Text
+                  style={[
+                    styles.terminalsTitle,
+                    isDark && { color: colors.text },
+                  ]}
+                >
+                  Terminals in Cebu
+                </Text>
               ) : (
                 <>
-                  <Text style={styles.composerPrefix}>Taga</Text>
+                  <Text
+                    style={[
+                      styles.composerPrefix,
+                      isDark && { color: colors.text },
+                    ]}
+                  >
+                    Taga
+                  </Text>
                   <Text style={styles.brand}>ZAPAC</Text>
-                  <Text style={styles.composerSuffix}>says...</Text>
+                  <Text
+                    style={[
+                      styles.composerSuffix,
+                      isDark && { color: colors.text },
+                    ]}
+                  >
+                    says...
+                  </Text>
                 </>
               )}
             </View>
@@ -314,6 +375,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#F4BE6C",
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
+  },
+  darkDragHeader: {
+    backgroundColor: "#A87938",
   },
   composerWrapper: {
     alignItems: "center",
