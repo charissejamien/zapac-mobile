@@ -7,20 +7,22 @@ import { AboutInfoCard } from '@/components/about/about-info-card';
 import { ABOUT_COLORS } from '@/components/about/about-theme';
 import { LegalRow } from '@/components/about/legal-row';
 import { SettingsSubpageHeader } from '@/components/settings/settings-subpage-header';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 export default function AboutScreen() {
+  const { colors } = useAppTheme();
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <StatusBar style="light" />
       <SettingsSubpageHeader onBack={() => router.back()} title="About ZAPAC" />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <AboutHero />
 
-        <Text style={styles.sectionTitle}>APP DETAILS</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>APP DETAILS</Text>
         <AboutInfoCard />
 
-        <Text style={styles.sectionTitle}>LEGAL INFORMATION</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>LEGAL INFORMATION</Text>
         <LegalRow
           icon="shield"
           label="Privacy Policy"

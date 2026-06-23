@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 interface RouteFare {
   route: string;
@@ -257,6 +258,7 @@ interface TerminalListProps {
 }
 
 export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
+  const { colors } = useAppTheme();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (

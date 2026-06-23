@@ -2,6 +2,7 @@ import { Feather } from '@expo/vector-icons';
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { LICENSE_COLORS } from './license-theme';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 type LicenseCardProps = {
   license: string;
@@ -11,18 +12,19 @@ type LicenseCardProps = {
 };
 
 export function LicenseCard({ license, name, repository, version }: LicenseCardProps) {
+  const { colors } = useAppTheme();
   return (
     <TouchableOpacity
       activeOpacity={0.75}
       onPress={() => Linking.openURL(repository)}
-      style={styles.card}
+      style={[styles.card, { backgroundColor: colors.surface }]}
     >
-      <View style={styles.iconBox}>
+      <View style={[styles.iconBox, { backgroundColor: colors.primarySoft }]}>
         <Feather name="package" size={17} color={LICENSE_COLORS.blue} />
       </View>
       <View style={styles.content}>
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.details}>v{version}  |  {license} License</Text>
+        <Text style={[styles.name, { color: colors.text }]}>{name}</Text>
+        <Text style={[styles.details, { color: colors.textMuted }]}>v{version}  |  {license} License</Text>
       </View>
       <Feather name="external-link" size={16} color="#9BA2AA" />
     </TouchableOpacity>

@@ -21,6 +21,7 @@ import {
 
 import InsightMenu from "./insight-menu";
 import { Insight } from "./types";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 interface Props {
   insight: Insight;
@@ -71,6 +72,7 @@ export default function InsightCard({
   onReact,
   onDelete,
 }: Props) {
+  const { colors } = useAppTheme();
   const { username, avatar_url } = insight.profiles;
   const liked = insight.userReaction === "like";
   const disliked = insight.userReaction === "dislike";

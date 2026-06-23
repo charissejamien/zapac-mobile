@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 
 import { NOTIFICATION_COLORS } from './notification-theme';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 type NotificationToggleRowProps = {
   description?: string;
@@ -20,13 +21,14 @@ export function NotificationToggleRow({
   onToggle,
   value,
 }: NotificationToggleRowProps) {
+  const { colors } = useAppTheme();
   return (
-    <View style={[styles.row, disabled && styles.disabledRow]}>
+    <View style={[styles.row, { backgroundColor: colors.surface }, disabled && styles.disabledRow]}>
       <View style={styles.rowStart}>
-        <View style={styles.iconBox}>{icon}</View>
+        <View style={[styles.iconBox, { backgroundColor: colors.primarySoft }]}>{icon}</View>
         <View style={styles.textBlock}>
-          <Text style={styles.label}>{label}</Text>
-          {description ? <Text style={styles.description}>{description}</Text> : null}
+          <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
+          {description ? <Text style={[styles.description, { color: colors.textMuted }]}>{description}</Text> : null}
         </View>
       </View>
 

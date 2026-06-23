@@ -8,8 +8,10 @@ import { NotificationHeader } from '@/components/notifications/notification-head
 import { NotificationSection } from '@/components/notifications/notification-section';
 import { NOTIFICATION_COLORS } from '@/components/notifications/notification-theme';
 import { NotificationToggleRow } from '@/components/notifications/notification-toggle-row';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 export default function NotificationsScreen() {
+  const { colors } = useAppTheme();
   const [showNotifications, setShowNotifications] = useState(true);
   const [showBadges, setShowBadges] = useState(true);
   const [floatingNotifications, setFloatingNotifications] = useState(true);
@@ -18,7 +20,7 @@ export default function NotificationsScreen() {
   const [allowVibration, setAllowVibration] = useState(true);
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <StatusBar style="light" />
       <NotificationHeader onBack={() => router.back()} />
 

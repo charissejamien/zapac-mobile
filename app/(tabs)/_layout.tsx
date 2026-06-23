@@ -2,14 +2,19 @@ import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
 import { HapticTab } from "@/components/haptic-tab";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 export default function TabLayout() {
+  const { colors, isDark } = useAppTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: "#FFFFFF",
-        tabBarActiveBackgroundColor: "rgba(255,255,255,0.16)",
+        tabBarActiveBackgroundColor: isDark
+          ? "rgba(255,255,255,0.12)"
+          : "rgba(255,255,255,0.16)",
         tabBarInactiveTintColor: "rgba(255,255,255,0.68)",
         tabBarButton: HapticTab,
         tabBarLabelStyle: {
@@ -22,7 +27,7 @@ export default function TabLayout() {
           paddingTop: 7,
           paddingBottom: 15,
           borderTopWidth: 0,
-          backgroundColor: "#527AAF",
+          backgroundColor: isDark ? "#18283B" : colors.primary,
         },
         tabBarItemStyle: {
           marginHorizontal: 10,

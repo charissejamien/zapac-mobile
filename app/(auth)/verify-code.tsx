@@ -12,10 +12,12 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 const CODE_LENGTH = 6;
 
 export default function VerifyCodeScreen() {
+  const { colors } = useAppTheme();
   const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(''));
   const [headerHeight, setHeaderHeight] = useState(0);
   const inputs = useRef<(TextInput | null)[]>([]);
@@ -43,6 +45,7 @@ export default function VerifyCodeScreen() {
         <View className="flex-1">
           <KeyboardAvoidingView
             className="flex-1 bg-white"
+            style={{ backgroundColor: colors.background }}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           >
             <ScrollView
@@ -58,18 +61,18 @@ export default function VerifyCodeScreen() {
                 <Text className="text-[32px] font-bold text-accent-green mb-3">
                   Enter Code
                 </Text>
-                <Text className="text-sm text-[#666] leading-5 mb-10">
+                <Text className="text-sm text-[#666] leading-5 mb-10" style={{ color: colors.textMuted }}>
                   Enter the code we sent you as verification to reset your password.
                 </Text>
 
-                <Text className="text-sm text-[#333] font-medium mb-4">Code</Text>
+                <Text className="text-sm text-[#333] font-medium mb-4" style={{ color: colors.text }}>Code</Text>
                 <View className="flex-row justify-between mb-10">
                   {Array(CODE_LENGTH).fill(0).map((_, i) => (
                     <TextInput
                       key={i}
                       ref={el => { inputs.current[i] = el; }}
                       className="bg-input-bg rounded-[10px] text-base text-center text-[#1A1A1A] font-semibold"
-                      style={{ width: 46, height: 52 }}
+                      style={{ width: 46, height: 52, backgroundColor: colors.input, color: colors.text }}
                       value={code[i]}
                       onChangeText={text => handleChange(text, i)}
                       onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, i)}
@@ -89,7 +92,7 @@ export default function VerifyCodeScreen() {
                 </TouchableOpacity>
 
                 <View className="flex-row justify-center items-center gap-1">
-                  <Text className="text-sm text-[#666]">Didn't receive code?</Text>
+                  <Text className="text-sm text-[#666]" style={{ color: colors.textMuted }}>Didn&apos;t receive code?</Text>
                   <TouchableOpacity onPress={() => {/* TODO: resend */}} activeOpacity={0.7}>
                     <Text className="text-sm text-error-red font-semibold">Resend Now</Text>
                   </TouchableOpacity>

@@ -7,24 +7,26 @@ import { PrivacyPolicySection } from '@/components/privacy/privacy-policy-sectio
 import { PrivacyText } from '@/components/privacy/privacy-text';
 import { PRIVACY_COLORS } from '@/components/privacy/privacy-theme';
 import { SettingsSubpageHeader } from '@/components/settings/settings-subpage-header';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 const SUPPORT_EMAIL = 'zapac.developers@gmail.com';
 
 export default function TermsOfServiceScreen() {
+  const { colors } = useAppTheme();
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <StatusBar style="light" />
       <SettingsSubpageHeader onBack={() => router.back()} title="Terms of Service" />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <View style={styles.introCard}>
+        <View style={[styles.introCard, { backgroundColor: colors.primarySoft }]}>
           <View style={styles.iconBadge}>
             <Feather name="file-text" size={22} color="#FFFFFF" />
           </View>
           <Text style={styles.eyebrow}>LET&apos;S TRAVEL RESPONSIBLY</Text>
-          <Text style={styles.title}>ZAPAC Terms of Service</Text>
-          <Text style={styles.updated}>Last updated: June 2, 2026</Text>
-          <Text style={styles.intro}>
+          <Text style={[styles.title, { color: colors.text }]}>ZAPAC Terms of Service</Text>
+          <Text style={[styles.updated, { color: colors.textMuted }]}>Last updated: June 2, 2026</Text>
+          <Text style={[styles.intro, { color: colors.text }]}>
             These Terms of Service govern your use of ZAPAC. By creating an account or using the
             app, you agree to these terms. If you do not agree, please do not use ZAPAC.
           </Text>
@@ -143,7 +145,7 @@ export default function TermsOfServiceScreen() {
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}`)}
-            style={styles.emailButton}
+            style={[styles.emailButton, { backgroundColor: colors.primarySoft }]}
           >
             <Feather name="mail" size={16} color={PRIVACY_COLORS.blue} />
             <Text style={styles.email}>{SUPPORT_EMAIL}</Text>

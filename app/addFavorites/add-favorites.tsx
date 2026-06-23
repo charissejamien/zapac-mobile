@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 const favoriteFields = [
   { label: "Name", placeholder: "Enter route name" },
@@ -18,10 +19,11 @@ const favoriteFields = [
 
 export default function AddFavorites() {
   const router = useRouter();
+  const { colors } = useAppTheme();
 
   return (
     <KeyboardAvoidingView
-      style={styles.screen}
+      style={[styles.screen, { backgroundColor: colors.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
@@ -43,15 +45,30 @@ export default function AddFavorites() {
             <View key={field.label} style={styles.fieldGroup}>
               <TextInput
                 placeholder={field.placeholder}
-                placeholderTextColor="#8A8A8A"
-                style={styles.input}
+                placeholderTextColor={colors.textMuted}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.primary,
+                    color: colors.text,
+                  },
+                ]}
               />
             </View>
           ))}
 
           <View style={styles.fieldGroup}>
-            <View style={styles.mapPlaceholder}>
-              <Text style={styles.mapPlaceholderText}>
+            <View
+              style={[
+                styles.mapPlaceholder,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.primary,
+                },
+              ]}
+            >
+              <Text style={[styles.mapPlaceholderText, { color: colors.textMuted }]}>
                 Map preview placeholder
               </Text>
             </View>

@@ -1,15 +1,17 @@
 import { PropsWithChildren } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 type SettingsSectionProps = PropsWithChildren<{
-  darkMode?: boolean;
   title: string;
 }>;
 
-export function SettingsSection({ children, darkMode = false, title }: SettingsSectionProps) {
+export function SettingsSection({ children, title }: SettingsSectionProps) {
+  const { colors } = useAppTheme();
+
   return (
     <View style={styles.section}>
-      <Text style={[styles.title, darkMode && styles.darkTitle]}>{title}</Text>
+      <Text style={[styles.title, { color: colors.textMuted }]}>{title}</Text>
       {children}
     </View>
   );
@@ -26,8 +28,5 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.25,
-  },
-  darkTitle: {
-    color: '#AAB8C9',
   },
 });

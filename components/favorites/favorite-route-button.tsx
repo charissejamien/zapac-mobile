@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text } from "react-native";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 type FavoriteRouteButtonProps = {
   label: string;
@@ -12,6 +13,7 @@ export function FavoriteRouteButton({
   variant = "filled",
 }: FavoriteRouteButtonProps) {
   const isOutline = variant === "outline";
+  const { colors } = useAppTheme();
 
   return (
     <Pressable
@@ -19,6 +21,9 @@ export function FavoriteRouteButton({
       style={({ pressed }) => [
         styles.button,
         isOutline ? styles.outlineButton : styles.filledButton,
+        isOutline
+          ? { backgroundColor: colors.surface, borderColor: colors.primary }
+          : { backgroundColor: colors.primary, borderColor: colors.primary },
         pressed && styles.pressed,
       ]}
     >
@@ -26,6 +31,7 @@ export function FavoriteRouteButton({
         style={[
           styles.label,
           isOutline ? styles.outlineLabel : styles.filledLabel,
+          isOutline && { color: colors.primary },
         ]}
       >
         {label}

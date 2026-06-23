@@ -89,7 +89,7 @@ const CommunityInsights = forwardRef<CommunityInsightsRef>((_props, ref) => {
     }));
 
     setInsights(merged);
-    setLoading(false);
+    text: setLoading(false);
   }, [userId]);
 
   useEffect(() => {
@@ -291,5 +291,9 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     textAlign: "center",
     marginTop: 5,
+  },
+  listContainer: {
+    paddingTop: 4,
+    paddingBottom: 120,
   },
 });

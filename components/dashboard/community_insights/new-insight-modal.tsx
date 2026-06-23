@@ -30,6 +30,7 @@ import {
 } from "lucide-react-native";
 
 import { supabase } from "@/src/lib/supabase";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 const SCREEN_HEIGHT =
   Dimensions.get("window").height;
@@ -140,6 +141,7 @@ export default function NewInsightModal({
   visible,
   onClose,
 }: Props) {
+  const { colors } = useAppTheme();
   const [content, setContent] = useState("");
   const [route, setRoute] = useState("");
   const [username, setUsername] = useState("");
@@ -232,7 +234,7 @@ export default function NewInsightModal({
       <TouchableWithoutFeedback
         onPress={handleClose}
       >
-        <View style={styles.overlay}>
+        <View style={[styles.overlay, { backgroundColor: colors.overlay }]}>
           <KeyboardAvoidingView
             behavior={
               Platform.OS === "ios"
@@ -245,6 +247,7 @@ export default function NewInsightModal({
               <Animated.View
                 style={[
                   styles.card,
+                  { backgroundColor: colors.surfaceElevated },
                   {
                     transform: [
                       {

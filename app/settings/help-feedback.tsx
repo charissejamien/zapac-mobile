@@ -9,6 +9,7 @@ import { FaqCard } from '@/components/help-feedback/faq-card';
 import { FeedbackForm } from '@/components/help-feedback/feedback-form';
 import { HELP_FEEDBACK_COLORS } from '@/components/help-feedback/help-feedback-theme';
 import { SettingsSubpageHeader } from '@/components/settings/settings-subpage-header';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 const FAQS = [
   {
@@ -29,6 +30,7 @@ const FAQS = [
 ];
 
 export default function HelpFeedbackScreen() {
+  const { colors } = useAppTheme();
   const [expandedFaq, setExpandedFaq] = useState<string | null>(FAQS[0].title);
   const [rating, setRating] = useState(0);
   const [message, setMessage] = useState('');
@@ -48,7 +50,7 @@ export default function HelpFeedbackScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={styles.screen}
+      style={[styles.screen, { backgroundColor: colors.background }]}
     >
       <StatusBar style="light" />
       <SettingsSubpageHeader onBack={() => router.back()} title="Help & Feedback" />
@@ -60,8 +62,8 @@ export default function HelpFeedbackScreen() {
       >
         <View style={styles.intro}>
           <Text style={styles.introEyebrow}>NEED A HAND?</Text>
-          <Text style={styles.introTitle}>Frequently Asked Questions</Text>
-          <Text style={styles.introDescription}>Tap a topic to find a quick answer.</Text>
+          <Text style={[styles.introTitle, { color: colors.text }]}>Frequently Asked Questions</Text>
+          <Text style={[styles.introDescription, { color: colors.textMuted }]}>Tap a topic to find a quick answer.</Text>
         </View>
 
         <View style={styles.faqs}>

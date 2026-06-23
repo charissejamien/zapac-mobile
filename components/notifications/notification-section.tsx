@@ -1,14 +1,16 @@
 import { PropsWithChildren } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useAppTheme } from '@/src/theme/app-theme';
 
 type NotificationSectionProps = PropsWithChildren<{
   title: string;
 }>;
 
 export function NotificationSection({ children, title }: NotificationSectionProps) {
+  const { colors } = useAppTheme();
   return (
     <View style={styles.section}>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, { color: colors.textMuted }]}>{title}</Text>
       {children}
     </View>
   );
