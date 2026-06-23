@@ -11,6 +11,7 @@ import {
 
 import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
+import { BusFront } from "lucide-react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 import CommunityInsights, {
@@ -63,7 +64,6 @@ const DARK_MAP_STYLE = [
 
 export default function Dashboard() {
   const { colors, isDark } = useAppTheme();
-  const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"insights" | "terminals">(
     "insights",
   );
@@ -237,26 +237,14 @@ export default function Dashboard() {
         {/* Terminal Marker Selection */}
         {selectedTerminal && (
           <Marker
-            key={`terminal-${selectedTerminal.latitude}-${selectedTerminal.longitude}`}
+            key={`native-terminal-pin-${selectedTerminal.latitude}-${selectedTerminal.longitude}`}
             coordinate={{
               latitude: selectedTerminal.latitude,
               longitude: selectedTerminal.longitude,
             }}
             title={selectedTerminal.title}
+            description="Bus terminal"
             pinColor="#74AFA0"
-          />
-        )}
-
-        {/* Autocomplete Searched Location Marker */}
-        {searchedPlace && (
-          <Marker
-            key={`search-${searchedPlace.latitude}-${searchedPlace.longitude}`}
-            coordinate={{
-              latitude: searchedPlace.latitude,
-              longitude: searchedPlace.longitude,
-            }}
-            title={searchedPlace.title}
-            pinColor="red"
           />
         )}
       </MapView>
@@ -267,7 +255,10 @@ export default function Dashboard() {
       </View>
 
       <View style={styles.buttonGroup}>
-        <TerminalButton onPress={toggleTerminalView} />
+        <TerminalButton
+          active={activeTab === "terminals"}
+          onPress={toggleTerminalView}
+        />
         <LocatorButton mapRef={mapRef} />
       </View>
 
@@ -296,34 +287,28 @@ export default function Dashboard() {
 
             <View style={styles.composer}>
               {activeTab === "terminals" ? (
-                <Text
-                  style={[
-                    styles.terminalsTitle,
-                    isDark && { color: colors.text },
-                  ]}
-                >
-                  Terminals in Cebu
-                </Text>
+                <View style={styles.terminalHeader}>
+                  <View style={styles.terminalHeaderIcon}>
+                    <BusFront size={18} color="#FFFFFF" />
+                  </View>
+                  <View>
+                    <Text style={styles.terminalsTitle}>Cebu terminals</Text>
+                    <Text style={styles.terminalsSubtitle}>
+                      Routes, fares, and details
+                    </Text>
+                  </View>
+                </View>
               ) : (
-                <>
-                  <Text
-                    style={[
-                      styles.composerPrefix,
-                      isDark && { color: colors.text },
-                    ]}
-                  >
-                    Taga
+                <View style={styles.insightsHeader}>
+                  <View style={styles.insightsBrandRow}>
+                    <Text style={styles.composerPrefix}>Taga</Text>
+                    <Text style={styles.brand}>ZAPAC</Text>
+                    <Text style={styles.composerSuffix}>says...</Text>
+                  </View>
+                  <Text style={styles.insightsSubtitle}>
+                    Community Insights
                   </Text>
-                  <Text style={styles.brand}>ZAPAC</Text>
-                  <Text
-                    style={[
-                      styles.composerSuffix,
-                      isDark && { color: colors.text },
-                    ]}
-                  >
-                    says...
-                  </Text>
-                </>
+                </View>
               )}
             </View>
           </TouchableOpacity>
@@ -364,7 +349,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     height: SHEET_HEIGHT,
-    backgroundColor: "#F6F6F6",
+    backgroundColor: "#F5F7F9",
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     overflow: "hidden",
@@ -399,25 +384,60 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 12,
   },
+  insightsHeader: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  insightsBrandRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+  },
   composerPrefix: {
-    fontSize: 18,
+    fontSize: 17,
     color: "#3D3D3D",
+    marginBottom: 2,
   },
   brand: {
-    fontSize: 26,
-    fontWeight: "700",
+    fontSize: 25,
+    fontWeight: "800",
     color: "#5F8796",
     marginHorizontal: 4,
   },
   composerSuffix: {
-    fontSize: 18,
+    fontSize: 17,
     color: "#3D3D3D",
-    marginBottom: 1,
+    marginBottom: 2,
+  },
+  insightsSubtitle: {
+    fontSize: 9,
+    fontWeight: "800",
+    color: "#8A6228",
+    letterSpacing: 1.1,
+    textTransform: "uppercase",
+    marginTop: 2,
   },
   terminalsTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#3D3D3D",
-    paddingVertical: 4,
+    fontSize: 17,
+    fontWeight: "800",
+    color: "#26354A",
+  },
+  terminalsSubtitle: {
+    fontSize: 10,
+    color: "#715B38",
+    marginTop: 1,
+  },
+  terminalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  terminalHeaderIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 11,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#74AFA0",
+    marginRight: 9,
   },
 });

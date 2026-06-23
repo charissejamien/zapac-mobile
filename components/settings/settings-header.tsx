@@ -10,12 +10,11 @@ type SettingsHeaderProps = {
   email: string;
   name: string;
   avatarUrl?: string;
-  onEditProfile: () => void;
   onAvatarPress: () => void;
   onEditUsername: () => void;
 };
 
-export function SettingsHeader({ email, name, avatarUrl, onEditProfile, onAvatarPress, onEditUsername }: SettingsHeaderProps) {
+export function SettingsHeader({ email, name, avatarUrl, onAvatarPress, onEditUsername }: SettingsHeaderProps) {
   return (
     <LinearGradient colors={SETTINGS_HEADER_GRADIENT} style={styles.header}>
       <SafeAreaView edges={['top']} style={styles.safeArea}>
@@ -41,7 +40,7 @@ export function SettingsHeader({ email, name, avatarUrl, onEditProfile, onAvatar
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.55}
-              onPress={onEditProfile}
+              onPress={onEditUsername}
               style={styles.editNameBtn}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >

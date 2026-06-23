@@ -11,6 +11,9 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.charissejamien.zapac",
+      "infoPlist": {
+        "UIViewControllerBasedStatusBarAppearance": true
+      },
       "config": {
         "googleMapsApiKey": "AIzaSyCWHublkXuYaWfT68qUwGY3o5L9NB82JA8"
       }

@@ -5,9 +5,18 @@ import React, {
   useImperativeHandle,
   useState,
 } from "react";
-import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+import { HeartHandshake, MessageCircleMore, ShieldCheck } from "lucide-react-native";
 
 import { supabase } from "@/src/lib/supabase";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 import FilterCarousel from "./filter-carousel";
 import InsightCard from "./insight-card";
@@ -20,11 +29,13 @@ export interface CommunityInsightsRef {
 }
 
 const CommunityInsights = forwardRef<CommunityInsightsRef>((_props, ref) => {
+  const { colors } = useAppTheme();
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState("All");
   const [showNewInsight, setShowNewInsight] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isAtFeedEnd, setIsAtFeedEnd] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -41,6 +52,12 @@ const CommunityInsights = forwardRef<CommunityInsightsRef>((_props, ref) => {
       });
 
     if (!rows) {
+      setLoading(false);
+      return;
+    }
+
+    if (rows.length === 0) {
+      setInsights([]);
       setLoading(false);
       return;
     }
@@ -75,7 +92,7 @@ const CommunityInsights = forwardRef<CommunityInsightsRef>((_props, ref) => {
     }));
 
     setInsights(merged);
-    text: setLoading(false);
+    setLoading(false);
   }, [userId]);
 
   useEffect(() => {
@@ -125,17 +142,109 @@ const CommunityInsights = forwardRef<CommunityInsightsRef>((_props, ref) => {
       ? insights
       : insights.filter((item) => item.category === selected);
 
+  useEffect(() => {
+    setIsAtFeedEnd(false);
+  }, [selected, filteredInsights.length]);
+
   return (
     <View style={styles.content}>
       <FilterCarousel selected={selected} onSelect={setSelected} />
 
       {loading ? (
-        <ActivityIndicator style={styles.loader} size="large" color="#74AFA0" />
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="#74AFA0" />
+          <Text style={[styles.loaderTitle, { color: colors.text }]}>
+            Gathering the latest road notes
+          </Text>
+          <Text style={[styles.loaderText, { color: colors.textMuted }]}>
+            One moment—we&apos;re checking what fellow commuters shared.
+          </Text>
+        </View>
       ) : (
         <FlatList
           data={filteredInsights}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContainer}
+          style={styles.list}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          scrollIndicatorInsets={{ bottom: 128 }}
+          scrollEventThrottle={16}
+          onScroll={({ nativeEvent }) => {
+            const { contentOffset, contentSize, layoutMeasurement } =
+              nativeEvent;
+            const isScrollable =
+              contentSize.height > layoutMeasurement.height + 24;
+            const reachedEnd =
+              contentOffset.y + layoutMeasurement.height >=
+              contentSize.height - 20;
+
+            setIsAtFeedEnd(isScrollable && reachedEnd);
+          }}
+          ListHeaderComponent={
+            <View>
+              <View
+                style={[
+                  styles.welcomeCard,
+                  { backgroundColor: colors.primarySoft },
+                ]}
+              >
+                <View style={styles.welcomeIcon}>
+                  <HeartHandshake size={20} color="#527AAF" />
+                </View>
+                <View style={styles.welcomeCopy}>
+                  <Text style={[styles.welcomeTitle, { color: colors.text }]}>
+                    A little local help goes a long way
+                  </Text>
+                  <Text
+                    style={[styles.welcomeText, { color: colors.textMuted }]}
+                  >
+                    See what others noticed, or share a quick update to make
+                    someone else&apos;s trip less stressful.
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.feedHeader}>
+                <View style={styles.feedSummary}>
+                  <View>
+                    <Text style={[styles.feedTitle, { color: colors.text }]}>
+                      What commuters are saying
+                    </Text>
+                    <Text
+                      style={[styles.feedSubtitle, { color: colors.textMuted }]}
+                    >
+                      Recent, community-shared updates
+                    </Text>
+                  </View>
+                  <View style={styles.insightCountBadge}>
+                    <Text style={styles.insightCountText}>
+                      {filteredInsights.length}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.kindnessNote}>
+                  <ShieldCheck size={12} color="#397968" />
+                  <Text style={styles.kindnessText}>
+                    Use updates as a helpful guide and stay aware on the road.
+                  </Text>
+                </View>
+              </View>
+            </View>
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIcon}>
+                <MessageCircleMore size={25} color="#527AAF" />
+              </View>
+              <Text style={[styles.emptyTitle, { color: colors.text }]}>
+                It&apos;s quiet here for now
+              </Text>
+              <Text style={[styles.emptyText, { color: colors.textMuted }]}>
+                If you&apos;re already on this route, a small update from you
+                could make another commuter feel more prepared.
+              </Text>
+            </View>
+          }
           renderItem={({ item }) => (
             <InsightCard
               insight={item}
@@ -147,7 +256,10 @@ const CommunityInsights = forwardRef<CommunityInsightsRef>((_props, ref) => {
         />
       )}
 
-      <InsightFAB onPress={() => setShowNewInsight(true)} />
+      <InsightFAB
+        hidden={isAtFeedEnd}
+        onPress={() => setShowNewInsight(true)}
+      />
 
       <NewInsightModal
         visible={showNewInsight}
@@ -167,8 +279,143 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
+
+  list: {
+    flex: 1,
+  },
+
+  listContent: {
+    paddingBottom: 148,
+    paddingTop: 2,
+  },
+  welcomeCard: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    borderRadius: 18,
+    padding: 14,
+    marginHorizontal: 16,
+    marginTop: 6,
+    marginBottom: 10,
+  },
+  welcomeIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 13,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+    marginRight: 11,
+  },
+  welcomeCopy: {
+    flex: 1,
+  },
+  welcomeTitle: {
+    fontSize: 13,
+    fontWeight: "800",
+  },
+  welcomeText: {
+    fontSize: 11,
+    lineHeight: 17,
+    marginTop: 3,
+  },
+
+  feedHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 6,
+    paddingBottom: 10,
+  },
+
+  feedSummary: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  feedTitle: {
+    color: "#26354A",
+    fontSize: 17,
+    fontWeight: "700",
+  },
+
+  feedSubtitle: {
+    color: "#7A8795",
+    fontSize: 11,
+    lineHeight: 16,
+    marginTop: 3,
+  },
+
+  insightCountText: {
+    color: "#527AAF",
+    fontSize: 11,
+    fontWeight: "800",
+  },
+  insightCountBadge: {
+    minWidth: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#EDF3F8",
+  },
+  kindnessNote: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 9,
+  },
+  kindnessText: {
+    flex: 1,
+    color: "#5C7B72",
+    fontSize: 9,
+    lineHeight: 13,
+  },
+
   loader: {
-    marginTop: 32,
+    alignItems: "center",
+    marginTop: 54,
+    paddingHorizontal: 36,
+  },
+  loaderTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    marginTop: 14,
+  },
+
+  loaderText: {
+    fontSize: 11,
+    lineHeight: 17,
+    textAlign: "center",
+    marginTop: 5,
+  },
+
+  emptyState: {
+    alignItems: "center",
+    marginHorizontal: 24,
+    marginTop: 42,
+  },
+
+  emptyIcon: {
+    width: 54,
+    height: 54,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#EDF3F8",
+  },
+
+  emptyTitle: {
+    color: "#26354A",
+    fontSize: 16,
+    fontWeight: "800",
+    marginTop: 14,
+  },
+
+  emptyText: {
+    color: "#7A8795",
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: "center",
+    marginTop: 5,
   },
   listContainer: {
     paddingTop: 4,

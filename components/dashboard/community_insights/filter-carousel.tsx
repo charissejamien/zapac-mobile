@@ -4,14 +4,28 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  View,
 } from "react-native";
 
+import {
+  AlertTriangle,
+  Coins,
+  LayoutGrid,
+  Route,
+  Star,
+} from "lucide-react-native";
+
 const FILTERS = [
-  "All",
-  "Warning",
-  "Shortcuts",
-  "Fare Tips",
-  "Driver Reviews",
+  { label: "All", icon: LayoutGrid, color: "#527AAF", tint: "#EDF3F8" },
+  { label: "Warning", icon: AlertTriangle, color: "#C65A43", tint: "#FFF0EC" },
+  { label: "Shortcuts", icon: Route, color: "#527AAF", tint: "#EDF3F8" },
+  { label: "Fare Tips", icon: Coins, color: "#A66A19", tint: "#FFF4E2" },
+  {
+    label: "Driver Reviews",
+    icon: Star,
+    color: "#397968",
+    tint: "#E7F2EF",
+  },
 ];
 
 interface Props {
@@ -24,19 +38,36 @@ export default function FilterCarousel({ selected, onSelect }: Props) {
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      style={styles.wrapper} // 👈 fixed height wrapper
+      style={styles.wrapper}
       contentContainerStyle={styles.container}
     >
       {FILTERS.map((filter) => (
         <TouchableOpacity
-          key={filter}
-          onPress={() => onSelect(filter)}
+          key={filter.label}
+          activeOpacity={0.8}
+          onPress={() => onSelect(filter.label)}
           style={[
             styles.button,
-            selected === filter && styles.selected,
+            selected === filter.label && {
+              backgroundColor: filter.tint,
+              borderColor: filter.color,
+            },
           ]}
         >
-          <Text style={styles.text}>{filter}</Text>
+          <View style={styles.icon}>
+            <filter.icon
+              size={13}
+              color={filter.color}
+            />
+          </View>
+          <Text
+            style={[
+              styles.text,
+              selected === filter.label && { color: filter.color },
+            ]}
+          >
+            {filter.label}
+          </Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -45,27 +76,30 @@ export default function FilterCarousel({ selected, onSelect }: Props) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    maxHeight: 60, // 36 (button) + 12 top + 12 bottom padding
+    maxHeight: 62,
   },
   container: {
     paddingHorizontal: 16,
-    paddingVertical: 12, // centered vertically instead of top-aligned
+    paddingVertical: 12,
   },
   button: {
-    backgroundColor: "#74AFA0",
-    width: 100,
+    flexDirection: "row",
+    backgroundColor: "transparent",
     height: 36,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 18,
+    borderRadius: 19,
     marginRight: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#E1E7EC",
   },
-  selected: {
-    opacity: 0.75,
+  icon: {
+    marginRight: 6,
   },
   text: {
-    color: "#FFF",
-    fontSize: 12,
-    fontWeight: "600",
+    color: "#536274",
+    fontSize: 11,
+    fontWeight: "700",
   },
 });

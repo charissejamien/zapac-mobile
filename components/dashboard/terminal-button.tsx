@@ -4,11 +4,19 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 
 interface TerminalButtonProps {
   onPress?: () => void;
+  active?: boolean;
 }
 
-export default function TerminalButton({ onPress }: TerminalButtonProps) {
+export default function TerminalButton({
+  onPress,
+  active = false,
+}: TerminalButtonProps) {
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <TouchableOpacity
+      activeOpacity={0.82}
+      style={[styles.button, active && styles.buttonActive]}
+      onPress={onPress}
+    >
       <BusFront size={20} color="#FFF" />
     </TouchableOpacity>
   );
@@ -28,5 +36,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  buttonActive: {
+    backgroundColor: "#527AAF",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
   },
 });
