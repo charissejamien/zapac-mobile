@@ -138,10 +138,6 @@ export default function SettingsScreen() {
     router.replace("/(auth)/login");
   };
 
-  const showComingSoon = (feature: string) => {
-    Alert.alert(feature, `${feature} will be available soon.`);
-  };
-
   const confirmLogout = () => {
     Alert.alert(
       "Log out?",
@@ -169,7 +165,7 @@ export default function SettingsScreen() {
         avatarUrl={avatarUrl}
         onAvatarPress={pickAvatar}
         onEditUsername={openEditUsername}
-        onEditProfile={() => showComingSoon("Edit profile")}
+        onEditProfile={() => router.push("/profile")}
       />
 
       <Modal
