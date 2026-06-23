@@ -280,7 +280,13 @@ export default function Dashboard() {
           },
         ]}
       >
-        <View {...panResponder.panHandlers} style={styles.dragHeader}>
+        <View
+          {...panResponder.panHandlers}
+          style={[
+            styles.dragHeader,
+            isDark && styles.darkDragHeader,
+          ]}
+        >
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={handleHeaderPress}
@@ -369,6 +375,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#F4BE6C",
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
+  },
+  darkDragHeader: {
+    backgroundColor: "#A87938",
   },
   composerWrapper: {
     alignItems: "center",
