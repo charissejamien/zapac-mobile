@@ -3,6 +3,7 @@ import {
   ChevronDown,
   ChevronUp,
   Clock3,
+  HeartHandshake,
   Navigation,
   Route,
   ShieldCheck,
@@ -270,15 +271,41 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
       showsVerticalScrollIndicator={false}
       scrollIndicatorInsets={{ bottom: 112 }}
       ListHeaderComponent={
-        <View style={styles.listHeader}>
-          <View>
-            <Text style={styles.eyebrow}>CEBU COMMUTE GUIDE</Text>
-            <Text style={styles.listTitle}>Choose your terminal</Text>
+        <View>
+          <View
+            style={[
+              styles.reassuranceCard,
+              { backgroundColor: colors.primarySoft },
+            ]}
+          >
+            <View style={styles.reassuranceIcon}>
+              <HeartHandshake size={19} color="#527AAF" />
+            </View>
+            <View style={styles.reassuranceCopy}>
+              <Text style={[styles.reassuranceTitle, { color: colors.text }]}>
+                Let&apos;s make the next step simpler
+              </Text>
+              <Text
+                style={[styles.reassuranceText, { color: colors.textMuted }]}
+              >
+                Pick a terminal to check its routes, fare estimates, facilities,
+                and exact map location.
+              </Text>
+            </View>
           </View>
-          <View style={styles.terminalCount}>
-            <Text style={styles.terminalCountText}>
-              {hardcodedTerminals.length}
-            </Text>
+
+          <View style={styles.listHeader}>
+            <View>
+              <Text style={styles.eyebrow}>NEARBY TRAVEL OPTIONS</Text>
+              <Text style={[styles.listTitle, { color: colors.text }]}>
+                Where are you heading from?
+              </Text>
+            </View>
+            <View style={styles.terminalCount}>
+              <Text style={styles.terminalCountText}>
+                {hardcodedTerminals.length}
+              </Text>
+            </View>
           </View>
         </View>
       }
@@ -287,7 +314,13 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
         const routeCount = item.details.routes_fares.length;
 
         return (
-          <View style={[styles.card, isExpanded && styles.cardExpanded]}>
+          <View
+            style={[
+              styles.card,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              isExpanded && styles.cardExpanded,
+            ]}
+          >
             <View style={styles.cardHeader}>
               <TouchableOpacity
                 activeOpacity={0.75}
@@ -299,7 +332,9 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
                 </View>
 
                 <View style={styles.titleBlock}>
-                  <Text style={styles.terminalName}>{item.name}</Text>
+                  <Text style={[styles.terminalName, { color: colors.text }]}>
+                    {item.name}
+                  </Text>
                   <View style={styles.quickMeta}>
                     <View style={styles.statusDot} />
                     <Text style={styles.statusText}>{item.details.status}</Text>
@@ -316,9 +351,17 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.destinationRow}>
+            <View
+              style={[
+                styles.destinationRow,
+                { backgroundColor: colors.surfaceMuted },
+              ]}
+            >
               <Route size={14} color="#5F8796" />
-              <Text style={styles.destinationText} numberOfLines={2}>
+              <Text
+                style={[styles.destinationText, { color: colors.textMuted }]}
+                numberOfLines={2}
+              >
                 {item.details.routes}
               </Text>
             </View>
@@ -336,7 +379,7 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
                 onPress={() => onSelectTerminal(item.lat, item.lng, item.name)}
               >
                 <Navigation size={14} color="#FFFFFF" />
-                <Text style={styles.mapButtonText}>View on map</Text>
+                <Text style={styles.mapButtonText}>Show me where</Text>
               </TouchableOpacity>
             </View>
 
@@ -348,8 +391,10 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
                       <Clock3 size={15} color="#527AAF" />
                     </View>
                     <View style={styles.infoCopy}>
-                      <Text style={styles.infoLabel}>Operating hours</Text>
-                      <Text style={styles.infoText}>{item.details.status}</Text>
+                      <Text style={styles.infoLabel}>When to go</Text>
+                      <Text style={[styles.infoText, { color: colors.text }]}>
+                        {item.details.status}
+                      </Text>
                     </View>
                   </View>
 
@@ -358,8 +403,8 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
                       <ShieldCheck size={15} color="#527AAF" />
                     </View>
                     <View style={styles.infoCopy}>
-                      <Text style={styles.infoLabel}>Facilities</Text>
-                      <Text style={styles.infoText}>
+                      <Text style={styles.infoLabel}>What&apos;s available</Text>
+                      <Text style={[styles.infoText, { color: colors.text }]}>
                         {item.details.facilities}
                       </Text>
                     </View>
@@ -367,8 +412,10 @@ export default function TerminalList({ onSelectTerminal }: TerminalListProps) {
                 </View>
 
                 <View style={styles.sectionHeading}>
-                  <Text style={styles.sectionTitle}>Routes & fares</Text>
-                  <Text style={styles.sectionHint}>Estimated minimum fare</Text>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                    Plan your ride
+                  </Text>
+                  <Text style={styles.sectionHint}>Fares are estimates</Text>
                 </View>
 
                 {item.details.routes_fares.map((rf, idx) => (
@@ -425,6 +472,34 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     paddingHorizontal: 2,
   },
+  reassuranceCard: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    borderRadius: 18,
+    padding: 14,
+    marginBottom: 18,
+  },
+  reassuranceIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+    marginRight: 11,
+  },
+  reassuranceCopy: {
+    flex: 1,
+  },
+  reassuranceTitle: {
+    fontSize: 13,
+    fontWeight: "800",
+  },
+  reassuranceText: {
+    fontSize: 11,
+    lineHeight: 17,
+    marginTop: 3,
+  },
   eyebrow: {
     color: "#74AFA0",
     fontSize: 10,
@@ -454,7 +529,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
     borderRadius: 20,
     padding: 14,
-    marginBottom: 12,
+    marginBottom: 18,
     borderWidth: 1,
     borderColor: "#E9EEF3",
     elevation: 3,
@@ -558,8 +633,8 @@ const styles = StyleSheet.create({
     gap: 6,
     borderRadius: 999,
     backgroundColor: "#527AAF",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 13,
+    paddingVertical: 9,
     justifyContent: "center",
     alignItems: "center",
   },

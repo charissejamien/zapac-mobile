@@ -63,6 +63,7 @@ const DARK_MAP_STYLE = [
 ];
 
 export default function Dashboard() {
+  const { colors, isDark } = useAppTheme();
   const [activeTab, setActiveTab] = useState<"insights" | "terminals">(
     "insights",
   );
@@ -246,18 +247,26 @@ export default function Dashboard() {
           >
             <View style={styles.markerWrapper}>
               <View style={styles.markerLabel}>
-                <Text style={styles.markerLabelText} numberOfLines={1}>
-                  {selectedTerminal.title}
-                </Text>
-              </View>
-
-              <View style={styles.markerHalo}>
-                <View style={styles.markerBadge}>
-                  <BusFront size={21} color="#FFFFFF" />
+                <View style={styles.markerLabelIcon}>
+                  <BusFront size={15} color="#FFFFFF" />
+                </View>
+                <View style={styles.markerLabelCopy}>
+                  <Text style={styles.markerEyebrow}>TERMINAL</Text>
+                  <Text style={styles.markerLabelText} numberOfLines={2}>
+                    {selectedTerminal.title}
+                  </Text>
                 </View>
               </View>
 
-              <View style={styles.markerTip} />
+              <View style={styles.markerNeedle}>
+                <View style={styles.markerNeedleHead}>
+                  <BusFront size={17} color="#FFFFFF" strokeWidth={2.4} />
+                </View>
+                <View style={styles.markerNeedleStem} />
+                <View style={styles.markerNeedlePoint} />
+              </View>
+
+              <View style={styles.markerGroundDot} />
             </View>
           </Marker>
         )}
@@ -308,7 +317,7 @@ export default function Dashboard() {
                   <View>
                     <Text style={styles.terminalsTitle}>Cebu terminals</Text>
                     <Text style={styles.terminalsSubtitle}>
-                      Routes, fares, and terminal details
+                      Routes, fares, and details
                     </Text>
                   </View>
                 </View>
@@ -456,59 +465,98 @@ const styles = StyleSheet.create({
   },
   markerWrapper: {
     alignItems: "center",
-    width: 190,
+    width: 220,
+    paddingBottom: 3,
   },
   markerLabel: {
-    maxWidth: 180,
-    borderRadius: 10,
+    width: 206,
+    minHeight: 54,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 16,
     backgroundColor: "#26354A",
     paddingHorizontal: 10,
-    paddingVertical: 6,
-    marginBottom: 5,
+    paddingVertical: 9,
+    marginBottom: 7,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.16)",
     shadowColor: "#26354A",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.28,
+    shadowRadius: 7,
+    elevation: 7,
+  },
+  markerLabelIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 11,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#74AFA0",
+    marginRight: 9,
+  },
+  markerLabelCopy: {
+    flex: 1,
+  },
+  markerEyebrow: {
+    color: "#A9D2C8",
+    fontSize: 8,
+    lineHeight: 10,
+    fontWeight: "900",
+    letterSpacing: 1.1,
   },
   markerLabelText: {
     color: "#FFFFFF",
     fontSize: 11,
-    fontWeight: "700",
-    textAlign: "center",
+    lineHeight: 14,
+    fontWeight: "800",
+    marginTop: 1,
   },
-  markerHalo: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+  markerNeedle: {
+    width: 56,
+    height: 76,
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(116, 175, 160, 0.24)",
   },
-  markerBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  markerNeedleHead: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#74AFA0",
-    borderWidth: 3,
+    borderWidth: 4,
     borderColor: "#FFFFFF",
     shadowColor: "#26354A",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 7,
+    zIndex: 2,
   },
-  markerTip: {
+  markerNeedleStem: {
+    width: 7,
+    height: 21,
+    backgroundColor: "#5A9B8B",
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: "rgba(255,255,255,0.7)",
+    marginTop: -2,
+  },
+  markerNeedlePoint: {
     width: 0,
     height: 0,
-    borderLeftWidth: 7,
-    borderRightWidth: 7,
+    borderLeftWidth: 5,
+    borderRightWidth: 5,
     borderTopWidth: 9,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
-    borderTopColor: "#74AFA0",
-    marginTop: -5,
+    borderTopColor: "#5A9B8B",
+  },
+  markerGroundDot: {
+    width: 14,
+    height: 4,
+    borderRadius: 8,
+    backgroundColor: "rgba(38,53,74,0.24)",
+    marginTop: -2,
   },
 });
