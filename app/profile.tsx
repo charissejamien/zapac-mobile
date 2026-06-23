@@ -2,10 +2,11 @@ import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
+  LayoutAnimation,
   Platform,
   ScrollView,
   StyleSheet,
@@ -24,8 +25,12 @@ import { SETTINGS_COLORS } from "@/components/settings/settings-theme";
 import { useAppTheme } from "@/src/theme/app-theme";
 
 export default function ProfileScreen() {
+  const params = useLocalSearchParams<{ email?: string; name?: string }>();
   const { colors } = useAppTheme();
-  const { deleteAccount, profile, updateProfile } = useProfile();
+  const { deleteAccount, profile, updateProfile } = useProfile({
+    email: params.email ?? "",
+    name: params.name ?? "",
+  });
   const [editing, setEditing] = useState<EditableProfileField | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -51,7 +56,9 @@ export default function ProfileScreen() {
         onBack={() => router.back()}
       />
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+      >
         <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>
           PERSONAL DETAILS
         </Text>
@@ -83,7 +90,12 @@ export default function ProfileScreen() {
             />
           }
           label="Date of Birth"
-          onPress={() => setShowDatePicker(true)}
+          onPress={() => {
+            LayoutAnimation.configureNext(
+              LayoutAnimation.Presets.easeInEaseOut,
+            );
+            setShowDatePicker(true);
+          }}
           value={profile.dob}
         />
         {showDatePicker && (
@@ -99,7 +111,12 @@ export default function ProfileScreen() {
             />
             {Platform.OS === "ios" && (
               <TouchableOpacity
-                onPress={() => setShowDatePicker(false)}
+                onPress={() => {
+                  LayoutAnimation.configureNext(
+                    LayoutAnimation.Presets.easeInEaseOut,
+                  );
+                  setShowDatePicker(false);
+                }}
                 style={[
                   styles.dateDoneButton,
                   { backgroundColor: colors.primary },

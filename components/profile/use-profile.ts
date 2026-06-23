@@ -15,8 +15,13 @@ const INITIAL_PROFILE: ProfileDetails = {
   dob: "Not set",
 };
 
-export function useProfile() {
-  const [profile, setProfile] = useState(INITIAL_PROFILE);
+type InitialProfile = Pick<ProfileDetails, "email" | "name">;
+
+export function useProfile(initialProfile?: InitialProfile) {
+  const [profile, setProfile] = useState<ProfileDetails>(() => ({
+    ...INITIAL_PROFILE,
+    ...initialProfile,
+  }));
 
   useEffect(() => {
     const fetchProfile = async () => {

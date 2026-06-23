@@ -40,6 +40,7 @@ export function SettingsHeader({ email, name, avatarUrl, onEditProfile, onAvatar
               <Text style={styles.name}>{name}</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              activeOpacity={0.55}
               onPress={onEditProfile}
               style={styles.editNameBtn}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}

@@ -17,6 +17,7 @@ export function ProfileHeader({ email, name, onBack }: ProfileHeaderProps) {
       <SafeAreaView edges={["top"]} style={styles.header}>
         <View style={styles.toolbar}>
           <TouchableOpacity
+            activeOpacity={0.55}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             onPress={onBack}
           >

@@ -290,14 +290,33 @@ export default function Dashboard() {
 
             <View style={styles.composer}>
               {activeTab === "terminals" ? (
-                <Text style={[styles.terminalsTitle, isDark && { color: colors.text }]}>
+                <Text
+                  style={[
+                    styles.terminalsTitle,
+                    isDark && { color: colors.text },
+                  ]}
+                >
                   Terminals in Cebu
                 </Text>
               ) : (
                 <>
-                  <Text style={[styles.composerPrefix, isDark && { color: colors.text }]}>Taga</Text>
+                  <Text
+                    style={[
+                      styles.composerPrefix,
+                      isDark && { color: colors.text },
+                    ]}
+                  >
+                    Taga
+                  </Text>
                   <Text style={styles.brand}>ZAPAC</Text>
-                  <Text style={[styles.composerSuffix, isDark && { color: colors.text }]}>says...</Text>
+                  <Text
+                    style={[
+                      styles.composerSuffix,
+                      isDark && { color: colors.text },
+                    ]}
+                  >
+                    says...
+                  </Text>
                 </>
               )}
             </View>
