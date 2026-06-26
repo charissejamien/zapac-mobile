@@ -2,6 +2,7 @@ import '../global.css';
 import { useEffect, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { Session } from '@supabase/supabase-js';
+import { StatusBar } from 'expo-status-bar';
 import { supabase } from '../src/lib/supabase';
 import { AppThemeProvider, useAppTheme } from '../src/theme/app-theme';
 
@@ -39,23 +40,25 @@ function RootNavigator() {
   const { colors, isDark } = useAppTheme();
 
   return (
-    <Stack
-      screenOptions={{
-        contentStyle: { backgroundColor: colors.background },
-        headerShown: false,
-        statusBarStyle: isDark ? "light" : "dark",
-      }}
-    >
-      <Stack.Screen name="(auth)" />
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen
-        name="settings"
-        options={{
-          animation: "default",
-          gestureEnabled: true,
+    <>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <Stack
+        screenOptions={{
+          contentStyle: { backgroundColor: colors.background },
+          headerShown: false,
         }}
-      />
-    </Stack>
+      >
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen
+          name="settings"
+          options={{
+            animation: "default",
+            gestureEnabled: true,
+          }}
+        />
+      </Stack>
+    </>
   );
 }
 
