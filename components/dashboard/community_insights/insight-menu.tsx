@@ -80,47 +80,21 @@ export default function InsightMenu({
                 More Options
               </Text>
 
-              <TouchableOpacity
-                style={styles.item}
-                onPress={handleClose}
-              >
-                <Ionicons
-                  name="arrow-redo-outline"
-                  size={20}
-                  color={colors.text}
-                />
-                <Text style={[styles.itemText, { color: colors.text }]}>
-                  Share
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.item}
-                onPress={handleClose}
-              >
-                <Ionicons
-                  name="flag-outline"
-                  size={20}
-                  color={colors.text}
-                />
-                <Text style={[styles.itemText, { color: colors.text }]}>
-                  Report
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.item}
-                onPress={handleClose}
-              >
-                <Ionicons
-                  name="download-outline"
-                  size={20}
-                  color={colors.text}
-                />
-                <Text style={[styles.itemText, { color: colors.text }]}>
-                  Save
-                </Text>
-              </TouchableOpacity>
+              {!isOwner && (
+                <TouchableOpacity
+                  style={styles.item}
+                  onPress={handleClose}
+                >
+                  <Ionicons
+                    name="flag-outline"
+                    size={20}
+                    color={colors.text}
+                  />
+                  <Text style={[styles.itemText, { color: colors.text }]}>
+                    Report
+                  </Text>
+                </TouchableOpacity>
+              )}
 
               {isOwner && (
                 <TouchableOpacity

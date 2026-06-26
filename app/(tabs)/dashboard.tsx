@@ -22,6 +22,7 @@ import SearchBar from "@/components/dashboard/searchbar";
 import TerminalButton from "@/components/dashboard/terminal-button";
 import TerminalList from "@/components/dashboard/terminal-list";
 import { useAppTheme } from "@/src/theme/app-theme";
+import { consumePendingPlace } from "@/src/lib/search-selection";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.9;
@@ -111,6 +112,25 @@ export default function Dashboard() {
       if (activeTab === "insights") {
         insightsRef.current?.refresh();
       }
+
+      const place = consumePendingPlace();
+      if (place) {
+        setSelectedTerminal(null);
+        setSearchedPlace({
+          latitude: place.latitude,
+          longitude: place.longitude,
+          title: place.name,
+        });
+        mapRef.current?.animateToRegion(
+          {
+            latitude: place.latitude,
+            longitude: place.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          },
+          1000,
+        );
+      }
     }, [activeTab]),
   );
 
@@ -159,26 +179,6 @@ export default function Dashboard() {
         longitude: lng,
         latitudeDelta: 0.008,
         longitudeDelta: 0.008,
-      },
-      1000,
-    );
-  };
-
-  // Callback to receive searched location from <SearchBar />
-  const handleSelectPlace = (lat: number, lng: number, name: string) => {
-    setSelectedTerminal(null); // Clear active terminal pin markers
-    setSearchedPlace({
-      latitude: lat,
-      longitude: lng,
-      title: name,
-    });
-
-    mapRef.current?.animateToRegion(
-      {
-        latitude: lat,
-        longitude: lng,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
       },
       1000,
     );
@@ -250,8 +250,7 @@ export default function Dashboard() {
       </MapView>
 
       <View style={styles.searchContainer}>
-        {/* FIXED: Added onSelectPlace prop binding here */}
-        <SearchBar mapRef={mapRef} onSelectPlace={handleSelectPlace} />
+        <SearchBar />
       </View>
 
       <View style={styles.buttonGroup}>
