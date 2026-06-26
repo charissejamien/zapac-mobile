@@ -32,6 +32,12 @@ yarn-error.*
 
 # local env files
 .env
+.env.local
+.env*.local
+
+# Next.js (admin)
+admin/.next/
+admin/node_modules/
 
 # typescript
 *.tsbuildinfo
