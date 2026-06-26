@@ -21,6 +21,7 @@ interface Props {
   isOwner: boolean;
   onClose: () => void;
   onDelete?: () => void;
+  onReport?: () => void;
 }
 
 export default function InsightMenu({
@@ -28,6 +29,7 @@ export default function InsightMenu({
   isOwner,
   onClose,
   onDelete,
+  onReport,
 }: Props) {
   const { colors } = useAppTheme();
   const slideAnim = useRef(
@@ -83,7 +85,7 @@ export default function InsightMenu({
               {!isOwner && (
                 <TouchableOpacity
                   style={styles.item}
-                  onPress={handleClose}
+                  onPress={() => onReport?.()}
                 >
                   <Ionicons
                     name="flag-outline"

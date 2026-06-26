@@ -4,6 +4,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { Session } from '@supabase/supabase-js';
 import { StatusBar } from 'expo-status-bar';
 import { supabase } from '../src/lib/supabase';
+import { useScreenTracking } from '../src/lib/screen-tracking';
 import { AppThemeProvider, useAppTheme } from '../src/theme/app-theme';
 
 function RootNavigator() {
@@ -11,6 +12,8 @@ function RootNavigator() {
   const [initialized, setInitialized] = useState(false);
   const segments = useSegments();
   const router = useRouter();
+
+  useScreenTracking();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {

@@ -20,6 +20,7 @@ import {
 } from "lucide-react-native";
 
 import InsightMenu from "./insight-menu";
+import ReportModal from "./report-modal";
 import { Insight } from "./types";
 import { useAppTheme } from "@/src/theme/app-theme";
 
@@ -28,6 +29,7 @@ interface Props {
   isOwner: boolean;
   onReact: (type: "like" | "dislike") => void;
   onDelete: () => void;
+  onReport: (reason: string, details: string) => void;
 }
 
 function timeAgo(dateStr: string): string {
@@ -71,6 +73,7 @@ export default function InsightCard({
   isOwner,
   onReact,
   onDelete,
+  onReport,
 }: Props) {
   const { colors } = useAppTheme();
   const { username, avatar_url } = insight.profiles;
@@ -80,6 +83,7 @@ export default function InsightCard({
   const CategoryIcon = categoryStyle.icon;
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const handleDelete = () => {
     setMenuOpen(false);
@@ -174,6 +178,19 @@ export default function InsightCard({
         isOwner={isOwner}
         onClose={() => setMenuOpen(false)}
         onDelete={handleDelete}
+        onReport={() => {
+          setMenuOpen(false);
+          setTimeout(() => setReportOpen(true), 300);
+        }}
+      />
+
+      <ReportModal
+        visible={reportOpen}
+        onClose={() => setReportOpen(false)}
+        onSubmit={(reason, details) => {
+          setReportOpen(false);
+          onReport(reason, details);
+        }}
       />
     </View>
   );

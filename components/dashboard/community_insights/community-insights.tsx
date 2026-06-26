@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -137,6 +138,23 @@ const CommunityInsights = forwardRef<CommunityInsightsRef>((_props, ref) => {
     await fetchInsights();
   };
 
+  const handleReport = async (insightId: string, reason: string, details: string) => {
+    if (!userId) return;
+
+    const { error } = await supabase.from("reported_insights").insert({
+      insight_id: insightId,
+      reported_by: userId,
+      reason,
+      details: details || null,
+    });
+
+    if (error) {
+      Alert.alert("Error", "Could not submit report. Please try again.");
+    } else {
+      Alert.alert("Report Submitted", "Thank you — we'll review this insight shortly.");
+    }
+  };
+
   const filteredInsights =
     selected === "All"
       ? insights
@@ -251,6 +269,7 @@ const CommunityInsights = forwardRef<CommunityInsightsRef>((_props, ref) => {
               isOwner={item.user_id === userId}
               onReact={(type) => handleReact(item.id, type)}
               onDelete={() => handleDelete(item.id)}
+              onReport={(reason, details) => handleReport(item.id, reason, details)}
             />
           )}
         />
