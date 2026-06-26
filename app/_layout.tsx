@@ -57,6 +57,13 @@ function RootNavigator() {
             gestureEnabled: true,
           }}
         />
+        <Stack.Screen
+          name="search"
+          options={{
+            animation: "slide_from_bottom",
+            gestureEnabled: true,
+          }}
+        />
       </Stack>
     </>
   );

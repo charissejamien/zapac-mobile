@@ -1,81 +1,86 @@
-import { Pressable, StyleSheet, Text } from "react-native";
-import { useAppTheme } from "@/src/theme/app-theme";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type FavoriteRouteButtonProps = {
   label: string;
   onPress?: () => void;
   variant?: "outline" | "filled";
+  icon?: React.ReactNode;
+  loading?: boolean;
+  disabled?: boolean;
 };
 
 export function FavoriteRouteButton({
   label,
   onPress,
   variant = "filled",
+  icon,
+  loading = false,
+  disabled = false,
 }: FavoriteRouteButtonProps) {
   const isOutline = variant === "outline";
-  const { colors } = useAppTheme();
+  const isDisabled = disabled || loading;
 
   return (
-    <Pressable
+    <TouchableOpacity
+      activeOpacity={0.8}
       onPress={onPress}
-      style={({ pressed }) => [
+      disabled={isDisabled}
+      style={[
         styles.button,
-        isOutline ? styles.outlineButton : styles.filledButton,
-        isOutline
-          ? { backgroundColor: colors.surface, borderColor: colors.primary }
-          : { backgroundColor: colors.primary, borderColor: colors.primary },
-        pressed && styles.pressed,
+        isOutline ? styles.outline : styles.filled,
+        isDisabled && { opacity: 0.4 },
       ]}
     >
-      <Text
-        style={[
-          styles.label,
-          isOutline ? styles.outlineLabel : styles.filledLabel,
-          isOutline && { color: colors.primary },
-        ]}
-      >
-        {label}
-      </Text>
-    </Pressable>
+      {loading ? (
+        <ActivityIndicator size="small" color={isOutline ? "#527AAF" : "#fff"} />
+      ) : (
+        <View style={styles.row}>
+          {icon}
+          <Text style={[styles.label, isOutline ? styles.outlineLabel : styles.filledLabel]}>
+            {label}
+          </Text>
+        </View>
+      )}
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    alignItems: "center",
-    borderRadius: 12,
-    elevation: 3,
     width: "100%",
-    height: 58,
+    height: 56,
+    borderRadius: 16,
+    alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.18,
-    shadowRadius: 3,
   },
-  outlineButton: {
-    backgroundColor: "#fff",
-    borderColor: "#527AAF",
+  outline: {
+    backgroundColor: "#FFFFFF",
     borderWidth: 2,
-  },
-  filledButton: {
-    backgroundColor: "#527AAF",
     borderColor: "#527AAF",
-    borderWidth: 1.5,
   },
-  pressed: {
-    opacity: 0.82,
+  filled: {
+    backgroundColor: "#397968",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
   },
   label: {
     fontSize: 16,
-    fontWeight: "500",
-    letterSpacing: 0.2,
+    fontWeight: "700",
   },
   outlineLabel: {
-    color: "#3F679F",
+    color: "#527AAF",
   },
   filledLabel: {
-    color: "#fff",
+    color: "#FFFFFF",
   },
 });
