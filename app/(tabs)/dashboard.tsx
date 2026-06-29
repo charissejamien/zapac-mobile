@@ -21,8 +21,8 @@ import LocatorButton from "@/components/dashboard/locator-button";
 import SearchBar from "@/components/dashboard/searchbar";
 import TerminalButton from "@/components/dashboard/terminal-button";
 import TerminalList from "@/components/dashboard/terminal-list";
-import { useAppTheme } from "@/src/theme/app-theme";
 import { consumePendingPlace } from "@/src/lib/search-selection";
+import { useAppTheme } from "@/src/theme/app-theme";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.9;
@@ -247,6 +247,19 @@ export default function Dashboard() {
             pinColor="#74AFA0"
           />
         )}
+
+        {searchedPlace && (
+          <Marker
+            key={`searched-place-pin-${searchedPlace.latitude}-${searchedPlace.longitude}`}
+            coordinate={{
+              latitude: searchedPlace.latitude,
+              longitude: searchedPlace.longitude,
+            }}
+            title={searchedPlace.title}
+            description="Searched Destination"
+            pinColor="#C65A43"
+          />
+        )}
       </MapView>
 
       <View style={styles.searchContainer}>
@@ -272,10 +285,7 @@ export default function Dashboard() {
       >
         <View
           {...panResponder.panHandlers}
-          style={[
-            styles.dragHeader,
-            isDark && styles.darkDragHeader,
-          ]}
+          style={[styles.dragHeader, isDark && styles.darkDragHeader]}
         >
           <TouchableOpacity
             activeOpacity={0.9}

@@ -7,6 +7,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import {
   Alert,
+  AlertButton,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -84,7 +85,6 @@ export default function SettingsScreen() {
     const ext = uri.split(".").pop() ?? "jpg";
     const path = `${userId}/avatar.${ext}`;
 
-    // Show the local image immediately so the user sees instant feedback
     setAvatarUrl(uri);
 
     const response = await fetch(uri);
@@ -102,7 +102,6 @@ export default function SettingsScreen() {
     const {
       data: { publicUrl },
     } = supabase.storage.from("avatars").getPublicUrl(path);
-    // Append timestamp to bust the CDN cache when the same path is overwritten
     const bustUrl = `${publicUrl}?t=${Date.now()}`;
 
     await supabase
@@ -110,6 +109,58 @@ export default function SettingsScreen() {
       .update({ avatar_url: bustUrl })
       .eq("id", userId);
     setAvatarUrl(bustUrl);
+  };
+
+  const deleteAvatar = async () => {
+    try {
+      const currentUrl = avatarUrl;
+      setAvatarUrl("");
+
+      const fileExtension = currentUrl.split("?")[0].split(".").pop() ?? "jpg";
+      const storagePath = `${userId}/avatar.${fileExtension}`;
+
+      await supabase.storage.from("avatars").remove([storagePath]);
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: "" })
+        .eq("id", userId);
+
+      if (error) throw error;
+    } catch (err: any) {
+      Alert.alert("Error deleting image profile", err.message);
+    }
+  };
+
+  const handleAvatarPress = () => {
+    const options: AlertButton[] = [
+      { text: "Choose from Library", onPress: pickAvatar },
+    ];
+
+    if (avatarUrl) {
+      options.push({
+        text: "Remove Current Photo",
+        style: "destructive",
+        onPress: () => {
+          Alert.alert(
+            "Remove Photo",
+            "Are you sure you want to delete your profile picture?",
+            [
+              { text: "Cancel", style: "cancel" },
+              { text: "Remove", style: "destructive", onPress: deleteAvatar },
+            ],
+          );
+        },
+      });
+    }
+
+    options.push({ text: "Cancel", style: "cancel" });
+
+    Alert.alert(
+      "Profile Photo",
+      "Choose an option to update your profile picture:",
+      options,
+    );
   };
 
   const openEditUsername = () => {
@@ -164,10 +215,11 @@ export default function SettingsScreen() {
         email={email}
         name={username}
         avatarUrl={avatarUrl}
-        onAvatarPress={pickAvatar}
+        onAvatarPress={handleAvatarPress}
         onEditUsername={openEditUsername}
       />
 
+      {/* Edit Username Modal */}
       <Modal
         visible={editingUsername}
         transparent
@@ -182,8 +234,15 @@ export default function SettingsScreen() {
             style={modalStyles.backdrop}
             onPress={() => setEditingUsername(false)}
           />
-          <View style={[modalStyles.card, { backgroundColor: colors.surfaceElevated }]}>
-            <Text style={[modalStyles.title, { color: colors.text }]}>Edit Username</Text>
+          <View
+            style={[
+              modalStyles.card,
+              { backgroundColor: colors.surfaceElevated },
+            ]}
+          >
+            <Text style={[modalStyles.title, { color: colors.text }]}>
+              Edit Username
+            </Text>
             <TextInput
               style={[
                 modalStyles.input,
@@ -228,8 +287,15 @@ export default function SettingsScreen() {
             style={modalStyles.backdrop}
             onPress={() => setDeleteStep(0)}
           />
-          <View style={[modalStyles.card, { backgroundColor: colors.surfaceElevated }]}>
-            <Text style={[modalStyles.title, { color: colors.text }]}>Delete Account?</Text>
+          <View
+            style={[
+              modalStyles.card,
+              { backgroundColor: colors.surfaceElevated },
+            ]}
+          >
+            <Text style={[modalStyles.title, { color: colors.text }]}>
+              Delete Account?
+            </Text>
             <Text style={[modalStyles.body, { color: colors.textMuted }]}>
               This will permanently delete your account and all associated data.
               This action cannot be undone.
@@ -270,8 +336,15 @@ export default function SettingsScreen() {
             style={modalStyles.backdrop}
             onPress={() => setDeleteStep(0)}
           />
-          <View style={[modalStyles.card, { backgroundColor: colors.surfaceElevated }]}>
-            <Text style={[modalStyles.title, { color: colors.text }]}>Confirm Deletion</Text>
+          <View
+            style={[
+              modalStyles.card,
+              { backgroundColor: colors.surfaceElevated },
+            ]}
+          >
+            <Text style={[modalStyles.title, { color: colors.text }]}>
+              Confirm Deletion
+            </Text>
             <Text style={[modalStyles.body, { color: colors.textMuted }]}>
               Type{" "}
               <Text style={{ fontWeight: "700", color: "#E53935" }}>
