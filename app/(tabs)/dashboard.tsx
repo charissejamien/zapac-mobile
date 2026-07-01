@@ -3,16 +3,17 @@ import {
   Animated,
   Dimensions,
   PanResponder,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
-import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
-import { BusFront } from "lucide-react-native";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { useFocusEffect, useRouter } from "expo-router";
+import { BusFront, Navigation, X } from "lucide-react-native";
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 
 import CommunityInsights, {
   CommunityInsightsRef,
@@ -24,87 +25,96 @@ import TerminalList from "@/components/dashboard/terminal-list";
 import { consumePendingPlace } from "@/src/lib/search-selection";
 import { useAppTheme } from "@/src/theme/app-theme";
 
+// 🔥 Import the decode utility directly from your routes component
+import { decodePolyline } from "@/app/routes/index";
+
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.9;
 const HEADER_HEIGHT = 70;
-const PREVIEW_HEIGHT = 280;
 const MINIMIZED_Y = SHEET_HEIGHT - HEADER_HEIGHT;
-const COLLAPSED_Y = SHEET_HEIGHT - PREVIEW_HEIGHT;
+const COLLAPSED_Y = SHEET_HEIGHT - 280;
 const EXPANDED_Y = 120;
 const SWIPE_THRESHOLD = 60;
-const DARK_MAP_STYLE = [
-  { elementType: "geometry", stylers: [{ color: "#17212D" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#AAB8C9" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#17212D" }] },
-  {
-    featureType: "road",
-    elementType: "geometry",
-    stylers: [{ color: "#2D3B49" }],
-  },
-  {
-    featureType: "road",
-    elementType: "geometry.stroke",
-    stylers: [{ color: "#1B2634" }],
-  },
-  {
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ color: "#0D1822" }],
-  },
-  {
-    featureType: "poi",
-    elementType: "geometry",
-    stylers: [{ color: "#1B2634" }],
-  },
-  {
-    featureType: "transit",
-    elementType: "geometry",
-    stylers: [{ color: "#253246" }],
-  },
-];
+
+const GOOGLE_MAPS_API_KEY = Platform.select({
+  ios: "AIzaSyCWHublkXuYaWfT68qUwGY3o5L9NB82JA8",
+  android: "AIzaSyAJP6e_5eBGz1j8b6DEKqLT-vest54Atkc",
+});
 
 export default function Dashboard() {
   const { colors, isDark } = useAppTheme();
+  const router = useRouter();
+
   const [activeTab, setActiveTab] = useState<"insights" | "terminals">(
     "insights",
   );
-
-  // Terminal Marker Selection State
+  const [currentLocation, setCurrentLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   const [selectedTerminal, setSelectedTerminal] = useState<{
     latitude: number;
     longitude: number;
     title: string;
   } | null>(null);
-
-  // FIXED: Declared missing searchedPlace state variable
   const [searchedPlace, setSearchedPlace] = useState<{
     latitude: number;
     longitude: number;
     title: string;
   } | null>(null);
 
+  // 🔥 Track polyline array points locally inside map dashboard layout
+  const [mapRouteCoordinates, setMapRouteCoordinates] = useState<
+    { latitude: number; longitude: number }[]
+  >([]);
+
   const mapRef = useRef<MapView>(null);
   const insightsRef = useRef<CommunityInsightsRef>(null);
 
-  useEffect(() => {
-    async function getInitialLocation() {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") return;
+  async function getUserLocation() {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") return null;
+    let location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+    });
+    const coords = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+    setCurrentLocation(coords);
+    return coords;
+  }
 
-      let location = await Location.getCurrentPositionAsync({});
+  // 🔥 RESTORE: Fetch route vectors locally when searching points
+  async function fetchLocalMapRoute(
+    originLat: number,
+    originLng: number,
+    destLat: number,
+    destLng: number,
+  ) {
+    try {
+      const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${originLat},${originLng}&destination=${destLat},${destLng}&mode=transit&key=${GOOGLE_MAPS_API_KEY}`;
+      const response = await fetch(url);
+      const json = await response.json();
 
-      mapRef.current?.animateToRegion(
-        {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.02,
-          longitudeDelta: 0.02,
-        },
-        1000,
-      );
+      if (json.routes && json.routes.length > 0) {
+        const points = decodePolyline(json.routes[0].overview_polyline.points);
+        setMapRouteCoordinates(points);
+      }
+    } catch (err) {
+      console.warn("Failed to update local polyline track map frame:", err);
     }
+  }
 
-    getInitialLocation();
+  useEffect(() => {
+    getUserLocation().then((coords) => {
+      if (coords) {
+        mapRef.current?.animateToRegion(
+          { ...coords, latitudeDelta: 0.02, longitudeDelta: 0.02 },
+          1000,
+        );
+      }
+    });
   }, []);
 
   useFocusEffect(
@@ -116,22 +126,33 @@ export default function Dashboard() {
       const place = consumePendingPlace();
       if (place) {
         setSelectedTerminal(null);
-        setSearchedPlace({
-          latitude: place.latitude,
-          longitude: place.longitude,
-          title: place.name,
-        });
+        const lat = Number(place.latitude);
+        const lng = Number(place.longitude);
+
+        setSearchedPlace({ latitude: lat, longitude: lng, title: place.name });
+        snapTo(MINIMIZED_Y);
+
         mapRef.current?.animateToRegion(
           {
-            latitude: place.latitude,
-            longitude: place.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
+            latitude: lat,
+            longitude: lng,
+            latitudeDelta: 0.015,
+            longitudeDelta: 0.015,
           },
-          1000,
+          800,
         );
+
+        // 🔥 Trigger local polyline update if current location is loaded
+        if (currentLocation) {
+          fetchLocalMapRoute(
+            currentLocation.latitude,
+            currentLocation.longitude,
+            lat,
+            lng,
+          );
+        }
       }
-    }, [activeTab]),
+    }, [activeTab, currentLocation]),
   );
 
   const translateY = useRef(new Animated.Value(COLLAPSED_Y)).current;
@@ -142,6 +163,8 @@ export default function Dashboard() {
     Animated.spring(translateY, {
       toValue: target,
       useNativeDriver: true,
+      tension: 45,
+      friction: 8,
     }).start();
   };
 
@@ -156,23 +179,20 @@ export default function Dashboard() {
   const toggleTerminalView = () => {
     if (activeTab === "terminals") {
       setActiveTab("insights");
-      setSelectedTerminal(null); // Clear terminal marker when returning to insights
+      setSelectedTerminal(null);
     } else {
       setActiveTab("terminals");
-      setSearchedPlace(null); // Clear active search marker when switching to terminals view
-      snapTo(EXPANDED_Y); // Open sheet instantly to reveal listings
+      setSearchedPlace(null);
+      setMapRouteCoordinates([]); // Clear polyline
+      snapTo(EXPANDED_Y);
     }
   };
 
   const handleSelectTerminal = (lat: number, lng: number, name: string) => {
     snapTo(MINIMIZED_Y);
-    setSearchedPlace(null); // Clear regular search marker to avoid overlap confusion
-    setSelectedTerminal({
-      latitude: lat,
-      longitude: lng,
-      title: name,
-    });
-
+    setSearchedPlace(null);
+    setMapRouteCoordinates([]); // Clear polyline
+    setSelectedTerminal({ latitude: lat, longitude: lng, title: name });
     mapRef.current?.animateToRegion(
       {
         latitude: lat,
@@ -187,7 +207,6 @@ export default function Dashboard() {
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dy) > 10,
-
       onPanResponderMove: (_, gesture) => {
         const clamped = Math.max(
           EXPANDED_Y,
@@ -195,28 +214,33 @@ export default function Dashboard() {
         );
         translateY.setValue(clamped);
       },
-
       onPanResponderRelease: (_, gesture) => {
         const cur = currentSnap.current;
-
         if (gesture.dy < -SWIPE_THRESHOLD) {
-          if (cur === MINIMIZED_Y) {
-            snapTo(COLLAPSED_Y);
-          } else {
-            snapTo(EXPANDED_Y);
-          }
+          snapTo(cur === MINIMIZED_Y ? COLLAPSED_Y : EXPANDED_Y);
         } else if (gesture.dy > SWIPE_THRESHOLD) {
-          if (cur === EXPANDED_Y) {
-            snapTo(COLLAPSED_Y);
-          } else {
-            snapTo(MINIMIZED_Y);
-          }
+          snapTo(cur === EXPANDED_Y ? COLLAPSED_Y : MINIMIZED_Y);
         } else {
           snapTo(cur);
         }
       },
     }),
   ).current;
+
+  const handleDirectionsPress = () => {
+    if (!searchedPlace) return;
+
+    router.push({
+      pathname: "/routes",
+      params: {
+        title: searchedPlace.title,
+        originLat: currentLocation?.latitude,
+        originLng: currentLocation?.longitude,
+        destLat: searchedPlace.latitude,
+        destLng: searchedPlace.longitude,
+      },
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -234,30 +258,34 @@ export default function Dashboard() {
           longitudeDelta: 0.02,
         }}
       >
-        {/* Terminal Marker Selection */}
         {selectedTerminal && (
           <Marker
-            key={`native-terminal-pin-${selectedTerminal.latitude}-${selectedTerminal.longitude}`}
             coordinate={{
               latitude: selectedTerminal.latitude,
               longitude: selectedTerminal.longitude,
             }}
             title={selectedTerminal.title}
-            description="Bus terminal"
             pinColor="#74AFA0"
           />
         )}
 
         {searchedPlace && (
           <Marker
-            key={`searched-place-pin-${searchedPlace.latitude}-${searchedPlace.longitude}`}
             coordinate={{
               latitude: searchedPlace.latitude,
               longitude: searchedPlace.longitude,
             }}
             title={searchedPlace.title}
-            description="Searched Destination"
             pinColor="#C65A43"
+          />
+        )}
+
+        {/* 🔥 RESTORED POLYLINE RENDERING LAYER */}
+        {mapRouteCoordinates.length > 0 && (
+          <Polyline
+            coordinates={mapRouteCoordinates}
+            strokeWidth={5}
+            strokeColor="#1E6091"
           />
         )}
       </MapView>
@@ -274,13 +302,46 @@ export default function Dashboard() {
         <LocatorButton mapRef={mapRef} />
       </View>
 
+      {searchedPlace && (
+        <View
+          style={[
+            styles.directionsButtonWrapper,
+            { bottom: SHEET_HEIGHT - MINIMIZED_Y + 16 },
+          ]}
+        >
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={handleDirectionsPress}
+            style={[styles.directionsButton, { backgroundColor: "#1E6091" }]}
+          >
+            <Navigation size={18} color="#FFF" strokeWidth={2.5} />
+            <Text style={styles.directionsButtonText}>Directions</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => {
+              setSearchedPlace(null);
+              setMapRouteCoordinates([]); // Clear polyline on dismiss
+            }}
+            style={[
+              styles.closeButton,
+              {
+                backgroundColor: colors.surfaceElevated,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <X size={18} color={colors.text} />
+          </TouchableOpacity>
+        </View>
+      )}
+
       <Animated.View
         style={[
           styles.sheet,
           { backgroundColor: colors.mapSheet },
-          {
-            transform: [{ translateY }],
-          },
+          { transform: [{ translateY }] },
         ]}
       >
         <View
@@ -293,7 +354,6 @@ export default function Dashboard() {
             style={styles.composerWrapper}
           >
             <View style={styles.handle} />
-
             <View style={styles.composer}>
               {activeTab === "terminals" ? (
                 <View style={styles.terminalHeader}>
@@ -333,17 +393,30 @@ export default function Dashboard() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+const DARK_MAP_STYLE = [
+  { elementType: "geometry", stylers: [{ color: "#17212D" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#AAB8C9" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#17212D" }] },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [{ color: "#2D3B49" }],
   },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#0D1822" }],
+  },
+];
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
   searchContainer: {
     position: "absolute",
     top: 50,
     left: 0,
     right: 0,
     zIndex: 9999,
-    overflow: "visible",
   },
   buttonGroup: {
     position: "absolute",
@@ -352,17 +425,51 @@ const styles = StyleSheet.create({
     zIndex: 90,
     gap: 12,
   },
+  directionsButtonWrapper: {
+    position: "absolute",
+    left: 16,
+    right: 16,
+    zIndex: 105,
+    flexDirection: "row",
+    gap: 10,
+  },
+  directionsButton: {
+    flex: 1,
+    height: 50,
+    borderRadius: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  directionsButtonText: { color: "#FFF", fontSize: 15, fontWeight: "700" },
+  closeButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+  },
   sheet: {
     position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
     height: SHEET_HEIGHT,
-    backgroundColor: "#F5F7F9",
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     overflow: "hidden",
-    elevation: 10,
     zIndex: 110,
   },
   dragHeader: {
@@ -370,13 +477,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
   },
-  darkDragHeader: {
-    backgroundColor: "#A87938",
-  },
-  composerWrapper: {
-    alignItems: "center",
-    alignSelf: "stretch",
-  },
+  darkDragHeader: { backgroundColor: "#A87938" },
+  composerWrapper: { alignItems: "center", alignSelf: "stretch" },
   handle: {
     width: 42,
     height: 5,
@@ -393,30 +495,16 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 12,
   },
-  insightsHeader: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  insightsBrandRow: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-  },
-  composerPrefix: {
-    fontSize: 17,
-    color: "#3D3D3D",
-    marginBottom: 2,
-  },
+  insightsHeader: { alignItems: "center", justifyContent: "center" },
+  insightsBrandRow: { flexDirection: "row", alignItems: "flex-end" },
+  composerPrefix: { fontSize: 17, color: "#3D3D3D", marginBottom: 2 },
   brand: {
     fontSize: 25,
     fontWeight: "800",
     color: "#5F8796",
     marginHorizontal: 4,
   },
-  composerSuffix: {
-    fontSize: 17,
-    color: "#3D3D3D",
-    marginBottom: 2,
-  },
+  composerSuffix: { fontSize: 17, color: "#3D3D3D", marginBottom: 2 },
   insightsSubtitle: {
     fontSize: 9,
     fontWeight: "800",
@@ -425,16 +513,8 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     marginTop: 2,
   },
-  terminalsTitle: {
-    fontSize: 17,
-    fontWeight: "800",
-    color: "#26354A",
-  },
-  terminalsSubtitle: {
-    fontSize: 10,
-    color: "#715B38",
-    marginTop: 1,
-  },
+  terminalsTitle: { fontSize: 17, fontWeight: "800", color: "#26354A" },
+  terminalsSubtitle: { fontSize: 10, color: "#715B38", marginTop: 1 },
   terminalHeader: {
     flexDirection: "row",
     alignItems: "center",
